@@ -33,10 +33,10 @@ class Settings(BaseSettings):
     pdf_brand_color: str = "#0066CC"
     
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file="/app/.env",
         env_file_encoding="utf-8",
         case_sensitive=False,
-        extra="ignore"  # Ignore extra fields in env
+        extra="ignore"
     )
 
 
