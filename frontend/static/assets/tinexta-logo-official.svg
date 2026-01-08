@@ -1,2 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 50">
+  <defs>
+    <style>
+      .tinexta-text { font-family: 'Arial', sans-serif; font-weight: 700; font-size: 24px; }
+      .infocert-text { font-family: 'Arial', sans-serif; font-weight: 600; font-size: 22px; }
+    </style>
+  </defs>
+  <!-- TINEXTA in blue -->
+  <text x="10" y="28" class="tinexta-text" fill="#0072CE">TINEXTA</text>
+  <!-- InfoCert in dark blue -->
+  <text x="130" y="28" class="infocert-text" fill="#005a9e">InfoCert</text>
+</svg>
