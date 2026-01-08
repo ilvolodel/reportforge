@@ -1,8 +1,9 @@
 import os
 import logging
+import smtplib
 from typing import Optional
-import boto3
-from botocore.exceptions import ClientError
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 logger = logging.getLogger(__name__)
@@ -10,19 +11,12 @@ logger = logging.getLogger(__name__)
 
 class EmailService:
     def __init__(self):
-        self.aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
-        self.aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-        self.aws_region = os.getenv("AWS_REGION", "eu-west-1")
-        self.sender_email = os.getenv("SES_SENDER_EMAIL", "noreply@brainaihub.tech")
-        self.sender_name = os.getenv("SES_SENDER_NAME", "ReportForge")
-        
-        # Initialize SES client
-        self.ses_client = boto3.client(
-            'ses',
-            region_name=self.aws_region,
-            aws_access_key_id=self.aws_access_key_id,
-            aws_secret_access_key=self.aws_secret_access_key
-        )
+        self.smtp_host = os.getenv("SMTP_HOST", "email-smtp.eu-west-1.amazonaws.com")
+        self.smtp_port = int(os.getenv("SMTP_PORT", "587"))
+        self.smtp_username = os.getenv("SMTP_USERNAME")
+        self.smtp_password = os.getenv("SMTP_PASSWORD")
+        self.sender_email = os.getenv("SMTP_SENDER_EMAIL", "noreply@brainaihub.tech")
+        self.sender_name = os.getenv("SMTP_SENDER_NAME", "ReportForge")
         
         # Initialize Jinja2 for email templates
         template_dir = os.path.join(os.path.dirname(__file__), "..", "templates", "email")
@@ -38,7 +32,7 @@ class EmailService:
         user_name: Optional[str] = None
     ) -> bool:
         """
-        Send magic link email to user using AWS SES
+        Send magic link email to user using AWS SES SMTP
         
         Args:
             to_email: Recipient email address
@@ -59,36 +53,31 @@ class EmailService:
             
             # Prepare email
             subject = os.getenv("MAGIC_LINK_SUBJECT", "Your ReportForge Magic Link")
-            sender = f"{self.sender_name} <{self.sender_email}>"
             
-            # Send email via SES
-            response = self.ses_client.send_email(
-                Source=sender,
-                Destination={
-                    'ToAddresses': [to_email]
-                },
-                Message={
-                    'Subject': {
-                        'Data': subject,
-                        'Charset': 'UTF-8'
-                    },
-                    'Body': {
-                        'Html': {
-                            'Data': html_body,
-                            'Charset': 'UTF-8'
-                        }
-                    }
-                }
-            )
+            # Create MIME message
+            msg = MIMEMultipart('alternative')
+            msg['From'] = f"{self.sender_name} <{self.sender_email}>"
+            msg['To'] = to_email
+            msg['Subject'] = subject
             
-            message_id = response.get('MessageId')
-            logger.info(f"Magic link email sent to {to_email}, MessageId: {message_id}")
+            # Attach HTML content
+            html_part = MIMEText(html_body, 'html', 'utf-8')
+            msg.attach(html_part)
+            
+            # Connect to AWS SES SMTP and send email
+            logger.info(f"Connecting to SMTP: {self.smtp_host}:{self.smtp_port}")
+            with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
+                server.starttls()  # Upgrade to secure connection
+                server.login(self.smtp_username, self.smtp_password)
+                
+                logger.info(f"Sending magic link email to {to_email}")
+                server.sendmail(self.sender_email, [to_email], msg.as_string())
+            
+            logger.info(f"✅ Magic link email sent successfully to {to_email}")
             return True
             
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            error_message = e.response['Error']['Message']
-            logger.error(f"SES ClientError sending to {to_email}: {error_code} - {error_message}")
+        except smtplib.SMTPException as e:
+            logger.error(f"SMTP error sending to {to_email}: {str(e)}")
             return False
             
         except Exception as e:
