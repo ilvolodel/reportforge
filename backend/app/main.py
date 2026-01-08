@@ -1,14 +1,18 @@
 """FastAPI main application."""
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Cookie, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime, timezone
 import os
 import logging
+from typing import Optional
 
 from .config import get_settings
+from .db.session import SessionLocal
+from .db.models import UserSession
 
 # Configure logging
 logging.basicConfig(
@@ -70,15 +74,35 @@ async def root(request: Request):
 
 
 @app.get("/dashboard")
-async def dashboard(request: Request):
-    """Dashboard page - main application interface."""
-    if templates:
-        # TODO: Add authentication check via session cookie
-        return templates.TemplateResponse("dashboard.html", {"request": request})
-    else:
+async def dashboard(request: Request, session_token: Optional[str] = Cookie(None)):
+    """Dashboard page - main application interface (requires authentication)."""
+    if not templates:
         return JSONResponse({
             "error": "Templates not configured"
         }, status_code=500)
+    
+    # Check authentication via session cookie
+    if not session_token:
+        return RedirectResponse(url="/", status_code=303)
+    
+    # Validate session
+    db = SessionLocal()
+    try:
+        now_utc = datetime.now(timezone.utc)
+        user_session = db.query(UserSession).filter(
+            UserSession.session_token == session_token,
+            UserSession.is_active == True,
+            UserSession.expires_at > now_utc
+        ).first()
+        
+        if not user_session:
+            # Invalid or expired session - redirect to login
+            return RedirectResponse(url="/", status_code=303)
+        
+        # Session valid - show dashboard
+        return templates.TemplateResponse("dashboard.html", {"request": request})
+    finally:
+        db.close()
 
 
 # Import and include API routers

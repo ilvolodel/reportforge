@@ -249,9 +249,13 @@ async def verify_magic_link(
             logger.warning(f"⚠️ Token invalid - is_used: {magic_link.is_used}, expires_at: {magic_link.expires_at}, now: {now_utc}")
             return HTMLResponse(content=INVALID_LINK_HTML, status_code=400)
         
-        # Mark magic link as used
+        # Mark magic link as used IMMEDIATELY and commit to prevent race condition with multiple requests
         magic_link.is_used = True
         magic_link.used_at = datetime.now(timezone.utc)
+        db.commit()  # ← COMMIT IMMEDIATELY so other concurrent requests see is_used=True
+        db.refresh(magic_link)
+        
+        logger.info(f"✅ Magic link marked as used and committed to DB")
         
         # Get user
         user = db.query(User).filter(User.id == magic_link.user_id).first()
