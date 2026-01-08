@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" fill="none">
+  <!-- Tinexta Logo - Corporate style -->
+  
+  <!-- Icon: Abstract "T" shape with connection dots -->
+  <g id="tinexta-icon">
+    <!-- Main T shape -->
+    <rect x="2" y="8" width="20" height="3" rx="1.5" fill="#0072CE"/>
+    <rect x="10.5" y="8" width="3" height="24" rx="1.5" fill="#0072CE"/>
+    
+    <!-- Connection dots (representing connectivity/digital) -->
+    <circle cx="4" cy="34" r="2" fill="#005a9e"/>
+    <circle cx="12" cy="36" r="2" fill="#005a9e"/>
+    <circle cx="20" cy="34" r="2" fill="#005a9e"/>
+    
+    <!-- Connecting lines -->
+    <path d="M 4 34 L 12 36 L 20 34" stroke="#0072CE" stroke-width="1" fill="none" opacity="0.5"/>
+  </g>
+  
+  <!-- Tinexta Text -->
+  <text x="28" y="25" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#0072CE" letter-spacing="0.5">
+    tinexta
+  </text>
+</svg>
