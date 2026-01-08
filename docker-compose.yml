@@ -9,7 +9,8 @@ services:
       POSTGRES_USER: reportforge
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-reportforge_password}
       POSTGRES_DB: reportforge
-      TZ: Europe/Rome
+      TZ: UTC
+      PGTZ: UTC
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -33,7 +34,7 @@ services:
     env_file:
       - ./.env
     environment:
-      - TZ=Europe/Rome
+      - TZ=UTC
       - PYTHONUNBUFFERED=1
       - PORT=8030
     depends_on:
