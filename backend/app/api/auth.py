@@ -229,8 +229,8 @@ async def verify_magic_link(
                 ).order_by(UserSession.created_at.desc()).first()
                 
                 if user_session:
-                    redirect_response = RedirectResponse(url="/dashboard", status_code=303)
-                    redirect_response.set_cookie(
+                    success_response = HTMLResponse(content=SUCCESS_LOGIN_HTML, status_code=200)
+                    success_response.set_cookie(
                         key="session_token",
                         value=user_session.session_token,
                         max_age=int(os.getenv("SESSION_EXPIRY_DAYS", "30")) * 24 * 60 * 60,
@@ -238,7 +238,7 @@ async def verify_magic_link(
                         secure=True,
                         samesite="lax"
                     )
-                    return redirect_response
+                    return success_response
                 else:
                     # Session not found, but link recently used - show error page with auto-redirect
                     logger.warning(f"⚠️ Session not found for recently used link, returning error page with auto-redirect")
@@ -278,11 +278,11 @@ async def verify_magic_link(
         
         logger.info(f"User {user.email} logged in successfully, session expires at {session_expires_at}")
         
-        # Create redirect response
-        redirect_response = RedirectResponse(url="/dashboard", status_code=303)
+        # Return HTML with JS redirect (instead of 303) to avoid browser double-request showing error page
+        success_response = HTMLResponse(content=SUCCESS_LOGIN_HTML, status_code=200)
         
         # Set session cookie (httponly for security)
-        redirect_response.set_cookie(
+        success_response.set_cookie(
             key="session_token",
             value=session_token,
             max_age=session_expiry_days * 24 * 60 * 60,
@@ -291,7 +291,7 @@ async def verify_magic_link(
             samesite="lax"
         )
         
-        return redirect_response
+        return success_response
         
     except HTTPException:
         raise
