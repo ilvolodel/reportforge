@@ -3,8 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReportForge - Login</title>
+    <title>ReportForge - Login | Tinexta InfoCert</title>
     <style>
+        :root {
+            --infocert-blue: #0072CE;
+            --infocert-dark-blue: #005a9e;
+            --infocert-light-blue: #e6f3fb;
+            --infocert-gray: #4a5568;
+            --infocert-light-gray: #f7f9fc;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -13,7 +23,7 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--infocert-blue) 0%, var(--infocert-dark-blue) 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -24,25 +34,32 @@
         .login-container {
             background: white;
             padding: 3rem;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 420px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            max-width: 440px;
             width: 100%;
         }
         
         .logo {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .logo-svg {
+            width: 180px;
+            height: auto;
+            margin-bottom: 1.5rem;
         }
         
         .logo h1 {
-            font-size: 2.5rem;
-            color: #667eea;
+            font-size: 1.75rem;
+            color: var(--infocert-blue);
             margin-bottom: 0.5rem;
+            font-weight: 600;
         }
         
         .logo p {
-            color: #666;
+            color: var(--infocert-gray);
             font-size: 0.95rem;
         }
         
@@ -55,85 +72,129 @@
             margin-bottom: 0.5rem;
             color: #333;
             font-weight: 500;
+            font-size: 0.95rem;
         }
         
         input[type="email"] {
             width: 100%;
-            padding: 0.875rem;
+            padding: 0.875rem 1rem;
             border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 1rem;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
         
         input[type="email"]:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--infocert-blue);
+            box-shadow: 0 0 0 3px rgba(0, 114, 206, 0.1);
         }
         
         button {
             width: 100%;
             padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--infocert-blue);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s;
         }
         
         button:hover {
+            background: var(--infocert-dark-blue);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 114, 206, 0.3);
         }
         
         button:active {
             transform: translateY(0);
         }
         
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         .info {
             margin-top: 1.5rem;
             padding: 1rem;
-            background: #f0f4ff;
-            border-radius: 8px;
-            color: #4a5568;
+            background: var(--infocert-light-blue);
+            border-left: 4px solid var(--infocert-blue);
+            border-radius: 6px;
+            color: var(--infocert-gray);
             font-size: 0.875rem;
-            line-height: 1.5;
+            line-height: 1.6;
         }
         
         .info strong {
-            color: #667eea;
+            color: var(--infocert-blue);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--success-green);
+        }
+        
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--error-red);
+        }
+        
+        .alert.show {
+            display: block;
         }
         
         .footer {
             text-align: center;
             margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e0e0e0;
             color: #999;
             font-size: 0.85rem;
         }
         
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: #10b981;
-            color: white;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 0.5rem;
+        .footer a {
+            color: var(--infocert-blue);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="logo">
-            <h1>🔥 ReportForge</h1>
-            <p>Monthly Report Generator <span class="status-badge">v1.0</span></p>
+            <!-- Tinexta InfoCert Logo SVG -->
+            <svg class="logo-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="15" width="30" height="30" fill="#0072CE" rx="3"/>
+                <text x="50" y="35" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#0072CE">ReportForge</text>
+                <text x="50" y="48" font-family="Arial, sans-serif" font-size="10" fill="#666">by Tinexta InfoCert</text>
+            </svg>
+            
+            <p>Monthly Report Generator for Business Ops</p>
         </div>
         
-        <form action="/api/auth/magic-link" method="POST">
+        <div id="alert" class="alert"></div>
+        
+        <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input 
@@ -146,19 +207,75 @@
                 />
             </div>
             
-            <button type="submit">
+            <button type="submit" id="submitBtn">
                 Send Magic Link
             </button>
         </form>
         
         <div class="info">
-            <strong>🔐 Passwordless Login</strong><br>
-            Enter your email address and we'll send you a magic link to sign in. No password needed!
+            <strong>🔐 Passwordless Authentication</strong>
+            Enter your INFOCERT email address and we'll send you a secure magic link to access the dashboard. No password needed!
         </div>
         
         <div class="footer">
-            Built with ❤️ for INFOCERT
+            <strong>ReportForge v1.0</strong><br>
+            Built with ❤️ for <a href="https://www.infocert.it" target="_blank">Tinexta InfoCert</a>
         </div>
     </div>
+    
+    <script>
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const submitBtn = document.getElementById('submitBtn');
+        const alert = document.getElementById('alert');
+        
+        function showAlert(message, type) {
+            alert.textContent = message;
+            alert.className = `alert ${type} show`;
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            
+            if (!email) {
+                showAlert('Please enter your email address', 'error');
+                return;
+            }
+            
+            // Disable button during submission
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            try {
+                const response = await fetch('/api/auth/magic-link', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert('✅ Magic link sent! Check your email inbox.', 'success');
+                    emailInput.value = '';
+                } else {
+                    showAlert(data.detail || 'Failed to send magic link. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('❌ Connection error. Please check your internet and try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Magic Link';
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ReportForge | Tinexta InfoCert</title>
+    <style>
+        :root {
+            --infocert-blue: #0072CE;
+            --infocert-dark-blue: #005a9e;
+            --infocert-light-blue: #e6f3fb;
+            --infocert-gray: #4a5568;
+            --infocert-light-gray: #f7f9fc;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --error-red: #ef4444;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--infocert-light-gray);
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            color: var(--infocert-blue);
+            margin-bottom: 0.25rem;
+        }
+        
+        .logo p {
+            font-size: 0.75rem;
+            color: #999;
+        }
+        
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-item {
+            padding: 0 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--infocert-gray);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .nav-link:hover {
+            background: var(--infocert-light-blue);
+            color: var(--infocert-blue);
+        }
+        
+        .nav-link.active {
+            background: var(--infocert-blue);
+            color: white;
+        }
+        
+        .nav-icon {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .nav-section {
+            padding: 1rem 1.5rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h2 {
+            color: #1f2937;
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .header p {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: var(--infocert-blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--infocert-dark-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 114, 206, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--infocert-blue);
+            border: 2px solid var(--infocert-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--infocert-light-blue);
+        }
+        
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .card-icon.blue {
+            background: var(--infocert-light-blue);
+            color: var(--infocert-blue);
+        }
+        
+        .card-icon.green {
+            background: #d1fae5;
+            color: var(--success-green);
+        }
+        
+        .card-icon.orange {
+            background: #fef3c7;
+            color: var(--warning-orange);
+        }
+        
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-footer {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .quick-actions h3 {
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .action-card {
+            padding: 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--infocert-gray);
+        }
+        
+        .action-card:hover {
+            border-color: var(--infocert-blue);
+            background: var(--infocert-light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .action-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        .action-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        /* User Menu */
+        .user-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            padding: 1rem 1.5rem;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--infocert-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-details {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.95rem;
+        }
+        
+        .user-email {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--error-red);
+            cursor: pointer;
+            padding: 0.5rem;
+            font-size: 1.25rem;
+        }
+        
+        .logout-btn:hover {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h1>📊 ReportForge</h1>
+            <p>Tinexta InfoCert</p>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="/dashboard" class="nav-link active">
+                    <span class="nav-icon">📈</span>
+                    Dashboard
+                </a>
+            </li>
+            
+            <div class="nav-section">Data Management</div>
+            
+            <li class="nav-item">
+                <a href="/reports" class="nav-link">
+                    <span class="nav-icon">📄</span>
+                    Reports
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="/projects" class="nav-link">
+                    <span class="nav-icon">🚀</span>
+                    Projects
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="/clients" class="nav-link">
+                    <span class="nav-icon">👥</span>
+                    Clients
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="/revenue" class="nav-link">
+                    <span class="nav-icon">💰</span>
+                    Revenue & Saving
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="/team" class="nav-link">
+                    <span class="nav-icon">👨‍💼</span>
+                    Team Members
+                </a>
+            </li>
+            
+            <div class="nav-section">Tools</div>
+            
+            <li class="nav-item">
+                <a href="/import" class="nav-link">
+                    <span class="nav-icon">📥</span>
+                    Import Data
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="/settings" class="nav-link">
+                    <span class="nav-icon">⚙️</span>
+                    Settings
+                </a>
+            </li>
+        </ul>
+        
+        <div class="user-menu">
+            <div class="user-info">
+                <div class="user-avatar">VD</div>
+                <div class="user-details">
+                    <div class="user-name">User</div>
+                    <div class="user-email">user@infocert.it</div>
+                </div>
+                <button class="logout-btn" onclick="logout()" title="Logout">🚪</button>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h2>Welcome back! 👋</h2>
+                <p>Here's an overview of your monthly reports</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="window.location.href='/reports/new'">
+                    + New Report
+                </button>
+                <button class="btn btn-primary" onclick="generatePDF()">
+                    📥 Generate PDF
+                </button>
+            </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Total Reports</span>
+                    <div class="card-icon blue">📄</div>
+                </div>
+                <div class="card-value">12</div>
+                <div class="card-footer">+2 this month</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Active Projects</span>
+                    <div class="card-icon green">🚀</div>
+                </div>
+                <div class="card-value">8</div>
+                <div class="card-footer">2 completed this month</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Total Revenue 2026</span>
+                    <div class="card-icon orange">💰</div>
+                </div>
+                <div class="card-value">2.6M€</div>
+                <div class="card-footer">Forecast for 2026</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Clients</span>
+                    <div class="card-icon blue">👥</div>
+                </div>
+                <div class="card-value">24</div>
+                <div class="card-footer">5 new this quarter</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="actions-grid">
+                <a href="/reports/new" class="action-card">
+                    <div class="action-icon">📝</div>
+                    <div class="action-title">Create Report</div>
+                    <div class="action-desc">Start a new monthly report</div>
+                </a>
+                
+                <a href="/projects/new" class="action-card">
+                    <div class="action-icon">➕</div>
+                    <div class="action-title">Add Project</div>
+                    <div class="action-desc">Register a new project</div>
+                </a>
+                
+                <a href="/clients/new" class="action-card">
+                    <div class="action-icon">🏢</div>
+                    <div class="action-title">Add Client</div>
+                    <div class="action-desc">Add a new client</div>
+                </a>
+                
+                <a href="/import" class="action-card">
+                    <div class="action-icon">📥</div>
+                    <div class="action-title">Import Data</div>
+                    <div class="action-desc">Bulk import from file</div>
+                </a>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                fetch('/api/auth/logout', {
+                    method: 'POST'
+                }).then(() => {
+                    window.location.href = '/';
+                });
+            }
+        }
+        
+        function generatePDF() {
+            alert('PDF generation coming soon! This will generate the monthly report.');
+        }
+    </script>
+</body>
+</html>
