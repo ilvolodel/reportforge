@@ -92,11 +92,14 @@ async def request_magic_link(
         magic_link_url = f"{app_url}/auth/verify?token={token}"
         
         # Send email
+        logger.info(f"📧 About to send magic link to {email}")
+        logger.info(f"🔗 Magic link URL: {magic_link_url}")
         email_sent = email_service.send_magic_link(
             to_email=email,
             magic_link=magic_link_url,
             user_name=user.full_name
         )
+        logger.info(f"📬 Email send result: {email_sent}")
         
         if not email_sent:
             logger.error(f"Failed to send email to {email}")
