@@ -1,18 +1,22 @@
 """Database connection and session management."""
 
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from .config import get_settings
 
-settings = get_settings()
+# Get DATABASE_URL directly from environment
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is required!")
 
 # Create SQLAlchemy engine
 engine = create_engine(
-    settings.database_url,
+    DATABASE_URL,
     pool_pre_ping=True,
     pool_size=10,
-    max_overflow=20
+    max_overflow=20,
+    echo=os.getenv("SQL_ECHO", "false").lower() == "true"
 )
 
 # Create SessionLocal class
@@ -23,7 +27,7 @@ Base = declarative_base()
 
 
 def get_db():
-    """Dependency for database session."""
+    """Dependency for FastAPI to get database session."""
     db = SessionLocal()
     try:
         yield db

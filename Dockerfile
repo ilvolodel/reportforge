@@ -1,6 +1,8 @@
 FROM python:3.11-slim
 
-# Install system dependencies for WeasyPrint
+WORKDIR /app
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
@@ -13,24 +15,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     shared-mime-info \
     curl \
     ca-certificates \
+    git \
+    postgresql-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
-WORKDIR /app
-
-# Copy requirements first (for better layer caching)
+# Copy and install Python dependencies
 COPY backend/requirements.txt /app/backend/requirements.txt
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
 # Copy application code
 COPY backend /app/backend
 COPY frontend /app/frontend
+COPY entrypoint.sh /app/entrypoint.sh
 
-# Create output directory for PDFs
-RUN mkdir -p /app/output
+# Capture git commit hash at build time (optional)
+ARG GIT_COMMIT=unknown
+RUN echo "$GIT_COMMIT" > /app/.git_commit
+
+# Create directories
+RUN mkdir -p /app/logs
+
+# Make entrypoint executable
+RUN chmod +x /app/entrypoint.sh
 
 # Set PYTHONPATH
 ENV PYTHONPATH=/app/backend
@@ -38,9 +45,9 @@ ENV PYTHONPATH=/app/backend
 # Expose port
 EXPOSE 8030
 
-# Health check endpoint will be added in main.py
+# Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8030}/health || exit 1
 
-# Run migrations and start server
-CMD ["sh", "-c", "cd /app/backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8030}"]
+# Run entrypoint script
+CMD ["/app/entrypoint.sh"]
