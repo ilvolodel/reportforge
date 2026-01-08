@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" fill="none">
+  <!-- InfoCert Logo Design -->
+  
+  <!-- Icon: Shield with checkmark representing security/certification -->
+  <g id="icon">
+    <!-- Shield background -->
+    <path d="M 25 15 L 25 38 C 25 48 30 53 40 58 C 50 53 55 48 55 38 L 55 15 L 25 15 Z" 
+          fill="#0072CE" stroke="#005a9e" stroke-width="1.5"/>
+    
+    <!-- Checkmark -->
+    <path d="M 32 36 L 37 42 L 48 28" 
+          stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- Small lock icon at bottom of shield -->
+    <circle cx="40" cy="50" r="2.5" fill="#0072CE"/>
+    <rect x="38" y="50" width="4" height="3" rx="0.5" fill="#0072CE"/>
+  </g>
+  
+  <!-- InfoCert Text -->
+  <g id="text" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="70" y="35" font-size="22" fill="#0072CE">InfoCert</text>
+  </g>
+  
+  <!-- Tinexta Group label -->
+  <g id="subtitle">
+    <text x="70" y="48" font-family="Arial, sans-serif" font-size="9" fill="#666" font-weight="400">
+      A Tinexta Group Company
+    </text>
+  </g>
+  
+  <!-- Decorative line -->
+  <line x1="70" y1="52" x2="165" y2="52" stroke="#e6f3fb" stroke-width="1"/>
+</svg>

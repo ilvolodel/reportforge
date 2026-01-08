@@ -13,7 +13,7 @@ echo "📝 Updating proxy-nginx..."
 sshpass -p "$DROPLET_PASS" ssh -o StrictHostKeyChecking=no $DROPLET_USER@$DROPLET_IP << 'EOF'
     sed -i "s|reportforge.bitsync.it|reportforge.brainaihub.tech|g" /opt/proxy-nginx/nginx/nginx.conf
     cd /opt/proxy-nginx
-    docker-compose restart nginx
+    docker compose restart nginx
     echo "✅ Proxy updated and restarted"
 EOF
 
@@ -22,15 +22,24 @@ echo ""
 echo "🔒 Generating SSL certificate..."
 sshpass -p "$DROPLET_PASS" ssh -o StrictHostKeyChecking=no $DROPLET_USER@$DROPLET_IP << EOF
     cd /opt/reportforge
-    docker-compose stop nginx
+    docker compose stop nginx
     
+    # Stop proxy to free port 80
+    cd /opt/proxy-nginx
+    docker compose stop nginx
+    
+    # Generate certificate
     certbot certonly --standalone \
         -d $NEW_DOMAIN \
         --email admin@brainaihub.tech \
         --agree-tos \
         --non-interactive
     
-    docker-compose start nginx
+    # Restart all
+    docker compose start nginx
+    cd /opt/reportforge
+    docker compose start nginx
+    
     echo "✅ SSL certificate generated"
 EOF
 
@@ -38,7 +47,7 @@ EOF
 echo ""
 echo "📦 Deploying new version..."
 cd /workspace/reportforge
-./deploy.sh
+bash deploy.sh
 
 echo ""
 echo "✅ Migration complete!"
