@@ -106,15 +106,14 @@ async def dashboard(request: Request, session_token: Optional[str] = Cookie(None
 
 
 # Import and include API routers
-from .api import auth
+from .api import auth, projects, clients, team, subscriptions
 
 app.include_router(auth.router)
 app.include_router(auth.public_router)  # Public routes without /api/ prefix
-
-# Additional routers (will add later)
-# from .api import projects, team_members, clients, subscriptions, reports
-# app.include_router(projects.router, prefix="/api/projects", tags=["projects"])
-# ... etc
+app.include_router(projects.router)
+app.include_router(clients.router)
+app.include_router(team.router)
+app.include_router(subscriptions.router)
 
 
 if __name__ == "__main__":
