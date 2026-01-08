@@ -4,8 +4,9 @@
 This microagent documents the **proven architecture patterns** and **deployment procedures** for ReportForge, based on the successful TrustyVault reference implementation running on the same droplet.
 
 **Last Updated**: 2026-01-08  
-**Status**: ✅ DEPLOYED & OPERATIONAL  
-**Current Commit**: 678ab6d
+**Status**: ✅ DEPLOYED & FULLY OPERATIONAL WITH HTTPS  
+**Current Commit**: 874f17f  
+**Public URL**: https://reportforge.bitsync.it
 
 ---
 
@@ -506,21 +507,102 @@ __pycache__/
 **Init Pattern**: `init_db.py` with `Base.metadata.create_all()` working  
 **Entrypoint**: `pg_isready` wait + init + uvicorn working  
 
-**Public URL**: https://reportforge.bitsync.it (nginx config pending)  
-**Internal API**: http://localhost:8030 (working)  
-**Health Check**: `GET /health` → 200 OK  
-**API Docs**: `GET /docs` → FastAPI Swagger UI  
+**Public URL**: ✅ https://reportforge.bitsync.it (HTTPS WORKING!)  
+**Internal API**: ✅ http://localhost:8030 (working)  
+**Health Check**: ✅ `GET /health` → 200 OK  
+**API Docs**: ✅ `GET /api/docs` → FastAPI Swagger UI  
+**SSL Certificate**: ✅ Valid Let's Encrypt cert (expires 2026-04-08)  
+
+---
+
+## 🔐 HTTPS / SSL Configuration
+
+### SSL Certificate Setup (Completed ✅)
+
+**Certificate Generated**: 2026-01-08  
+**Domain**: reportforge.bitsync.it  
+**Provider**: Let's Encrypt  
+**Expiry**: 2026-04-08  
+**Location**: `/etc/letsencrypt/live/reportforge.bitsync.it/`
+
+### Nginx HTTPS Configuration
+
+**File**: `nginx/conf.d/reportforge.bitsync.it.conf`
+
+Key configuration blocks:
+
+1. **HTTP Server (Port 80)**: 
+   - Handles ACME challenges for certbot renewal
+   - Redirects all traffic to HTTPS
+   - Keeps `/health` endpoint accessible on HTTP
+
+2. **HTTPS Server (Port 443)**:
+   - SSL/TLS certificates from `/etc/letsencrypt/live/reportforge.bitsync.it/`
+   - HTTP/2 enabled
+   - Security headers (HSTS, X-Frame-Options, etc.)
+   - Proxies all requests to backend:8030
+
+### Docker Volumes for SSL
+
+**docker-compose.yml** mounts (following TrustyVault pattern):
+```yaml
+volumes:
+  - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  - ./nginx/conf.d:/etc/nginx/conf.d:ro
+  - swissknife_ssl-data:/etc/letsencrypt:ro
+  - swissknife_certbot-webroot:/var/www/certbot
+```
+
+### SNI Routing via proxy-nginx
+
+**Configuration**: `/opt/proxy-nginx/nginx/nginx.conf`
+
+Stream block maps SNI hostname to backend:
+```nginx
+map $ssl_preread_server_name $backend {
+    reportforge.bitsync.it    reportforge-nginx:443;
+    # ... other services
+}
+
+server {
+    listen 443;
+    ssl_preread on;
+    proxy_pass $backend;
+}
+```
+
+**Important**: After adding new SNI entries, reload proxy-nginx:
+```bash
+docker exec proxy-nginx nginx -s reload
+```
+
+### SSL Verification Commands
+
+```bash
+# Test certificate validity
+curl -v https://reportforge.bitsync.it/health 2>&1 | grep "subject:"
+# → subject: CN=reportforge.bitsync.it
+
+# Test expiry date
+curl -v https://reportforge.bitsync.it/health 2>&1 | grep "expire date:"
+# → expire date: Apr  8 08:00:07 2026 GMT
+
+# Test TLS version
+curl -v https://reportforge.bitsync.it/health 2>&1 | grep "SSL connection"
+# → SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
+```
 
 ---
 
 ## 🎯 Next Steps
 
-1. **Complete nginx configuration** (Task 8)
-   - Copy working pattern from TrustyVault
-   - Test SSL certificates
-   - Verify public URL access
+1. **✅ COMPLETED: Configure HTTPS with SSL certificates** (Task 13)
+   - ✅ Generated Let's Encrypt certificate
+   - ✅ Configured nginx for HTTPS
+   - ✅ Set up SNI routing in proxy-nginx
+   - ✅ Verified public HTTPS access
 
-2. **Implement Magic Link authentication** (Task 10)
+2. **Implement Magic Link authentication** (Task 15)
    - Email sending with aiosmtplib
    - Token generation and validation
    - Session management
