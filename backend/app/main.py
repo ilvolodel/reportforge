@@ -11,8 +11,8 @@ import logging
 from typing import Optional
 
 from .config import get_settings
-from .db.session import SessionLocal
-from .db.models import UserSession
+from .database import SessionLocal
+from .models.user import UserSession
 
 # Configure logging
 logging.basicConfig(
