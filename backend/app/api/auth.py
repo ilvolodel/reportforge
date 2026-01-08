@@ -75,7 +75,10 @@ async def request_magic_link(
         
         # Calculate expiry time (use naive datetime in UTC for PostgreSQL compatibility)
         expiry_minutes = int(os.getenv("MAGIC_LINK_EXPIRY_MINUTES", "15"))
-        expires_at = datetime.utcnow() + timedelta(minutes=expiry_minutes)
+        now_utc = datetime.utcnow()
+        expires_at = now_utc + timedelta(minutes=expiry_minutes)
+        
+        logger.info(f"⏰ Creating magic link - now_utc: {now_utc}, expires_at: {expires_at}")
         
         # Save magic link to database
         magic_link = MagicLink(
