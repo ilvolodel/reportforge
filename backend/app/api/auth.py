@@ -18,6 +18,41 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 public_router = APIRouter(tags=["Authentication - Public"])
 
 
+# HTML template for invalid link with auto-redirect to dashboard if already logged in
+INVALID_LINK_HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invalid Link - ReportForge</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #0072CE 0%, #005a9e 100%); color: white; }
+        .container { background: white; color: #333; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #dc3545; }
+        a { color: #0072CE; text-decoration: none; font-weight: bold; }
+        .checking { color: #0072CE; font-size: 14px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>❌ Link non valido o scaduto</h1>
+        <p>Questo magic link non è valido o è già stato utilizzato.</p>
+        <p>I link scadono dopo 15 minuti per sicurezza.</p>
+        <p class="checking">⏳ Verifica accesso in corso...</p>
+        <p><a href="/">← Torna alla pagina di login</a></p>
+    </div>
+    <script>
+        // Auto-redirect to dashboard after 1 second (handles double-click/double-request issue)
+        // If user has valid session cookie, dashboard will load, otherwise will redirect to login
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 1000);
+    </script>
+</body>
+</html>
+"""
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -150,31 +185,7 @@ async def verify_magic_link(
         
         if not magic_link:
             logger.warning(f"⚠️ Token not found in database")
-            return HTMLResponse(
-                content="""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Invalid Link - ReportForge</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #0072CE 0%, #005a9e 100%); color: white; }
-                        .container { background: white; color: #333; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-                        h1 { color: #dc3545; }
-                        a { color: #0072CE; text-decoration: none; font-weight: bold; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <h1>❌ Link non valido o scaduto</h1>
-                        <p>Questo magic link non è valido o è già stato utilizzato.</p>
-                        <p>I link scadono dopo 15 minuti per sicurezza.</p>
-                        <p><a href="/">← Torna alla pagina di login</a></p>
-                    </div>
-                </body>
-                </html>
-                """,
-                status_code=400
-            )
+            return HTMLResponse(content=INVALID_LINK_HTML, status_code=400)
         
         # Check if already used recently (within 10 seconds) - allow re-redirect to handle double-clicks
         if magic_link.is_used and magic_link.used_at:
@@ -205,31 +216,7 @@ async def verify_magic_link(
         # Check if token is valid and not expired
         if magic_link.is_used or magic_link.expires_at <= now_utc:
             logger.warning(f"⚠️ Token invalid - is_used: {magic_link.is_used}, expires_at: {magic_link.expires_at}, now: {now_utc}")
-            return HTMLResponse(
-                content="""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Invalid Link - ReportForge</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #0072CE 0%, #005a9e 100%); color: white; }
-                        .container { background: white; color: #333; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-                        h1 { color: #dc3545; }
-                        a { color: #0072CE; text-decoration: none; font-weight: bold; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <h1>❌ Link non valido o scaduto</h1>
-                        <p>Questo magic link non è valido o è già stato utilizzato.</p>
-                        <p>I link scadono dopo 15 minuti per sicurezza.</p>
-                        <p><a href="/">← Torna alla pagina di login</a></p>
-                    </div>
-                </body>
-                </html>
-                """,
-                status_code=400
-            )
+            return HTMLResponse(content=INVALID_LINK_HTML, status_code=400)
         
         # Mark magic link as used
         magic_link.is_used = True
