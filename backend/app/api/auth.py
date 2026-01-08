@@ -15,6 +15,7 @@ from ..services.email_service import email_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
+public_router = APIRouter(tags=["Authentication - Public"])
 
 
 def get_db():
@@ -122,7 +123,7 @@ async def request_magic_link(
         )
 
 
-@router.get("/verify")
+@public_router.get("/auth/verify")
 async def verify_magic_link(
     token: str,
     response: Response,

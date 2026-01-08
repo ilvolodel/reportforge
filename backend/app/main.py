@@ -78,6 +78,7 @@ async def dashboard(request: Request):
 from .api import auth
 
 app.include_router(auth.router)
+app.include_router(auth.public_router)  # Public routes without /api/ prefix
 
 # Additional routers (will add later)
 # from .api import projects, team_members, clients, subscriptions, reports
