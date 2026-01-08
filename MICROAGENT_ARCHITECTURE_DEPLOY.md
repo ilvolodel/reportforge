@@ -6,7 +6,7 @@ This microagent documents the **proven architecture patterns** and **deployment 
 **Last Updated**: 2026-01-08  
 **Status**: ✅ DEPLOYED & FULLY OPERATIONAL WITH HTTPS  
 **Current Commit**: 874f17f  
-**Public URL**: https://reportforge.bitsync.it
+**Public URL**: https://reportforge.brainaihub.tech
 
 ---
 
@@ -294,7 +294,7 @@ SMTP_FROM=ReportForge <noreply@infocert.it>
 
 # Application
 APP_NAME=ReportForge
-APP_URL=https://reportforge.bitsync.it
+APP_URL=https://reportforge.brainaihub.tech
 DEBUG=false
 ENVIRONMENT=production
 
@@ -365,7 +365,7 @@ PDF_BRAND_COLOR=#0066CC
    # → FastAPI Swagger UI (HTML)
    
    # Public URL (through proxy-nginx)
-   curl https://reportforge.bitsync.it/health
+   curl https://reportforge.brainaihub.tech/health
    # → Should work once nginx config is complete
    ```
 
@@ -507,7 +507,7 @@ __pycache__/
 **Init Pattern**: `init_db.py` with `Base.metadata.create_all()` working  
 **Entrypoint**: `pg_isready` wait + init + uvicorn working  
 
-**Public URL**: ✅ https://reportforge.bitsync.it (HTTPS WORKING!)  
+**Public URL**: ✅ https://reportforge.brainaihub.tech (HTTPS WORKING!)  
 **Internal API**: ✅ http://localhost:8030 (working)  
 **Health Check**: ✅ `GET /health` → 200 OK  
 **API Docs**: ✅ `GET /api/docs` → FastAPI Swagger UI  
@@ -520,14 +520,14 @@ __pycache__/
 ### SSL Certificate Setup (Completed ✅)
 
 **Certificate Generated**: 2026-01-08  
-**Domain**: reportforge.bitsync.it  
+**Domain**: reportforge.brainaihub.tech  
 **Provider**: Let's Encrypt  
 **Expiry**: 2026-04-08  
-**Location**: `/etc/letsencrypt/live/reportforge.bitsync.it/`
+**Location**: `/etc/letsencrypt/live/reportforge.brainaihub.tech/`
 
 ### Nginx HTTPS Configuration
 
-**File**: `nginx/conf.d/reportforge.bitsync.it.conf`
+**File**: `nginx/conf.d/reportforge.brainaihub.tech.conf`
 
 Key configuration blocks:
 
@@ -537,7 +537,7 @@ Key configuration blocks:
    - Keeps `/health` endpoint accessible on HTTP
 
 2. **HTTPS Server (Port 443)**:
-   - SSL/TLS certificates from `/etc/letsencrypt/live/reportforge.bitsync.it/`
+   - SSL/TLS certificates from `/etc/letsencrypt/live/reportforge.brainaihub.tech/`
    - HTTP/2 enabled
    - Security headers (HSTS, X-Frame-Options, etc.)
    - Proxies all requests to backend:8030
@@ -560,7 +560,7 @@ volumes:
 Stream block maps SNI hostname to backend:
 ```nginx
 map $ssl_preread_server_name $backend {
-    reportforge.bitsync.it    reportforge-nginx:443;
+    reportforge.brainaihub.tech    reportforge-nginx:443;
     # ... other services
 }
 
@@ -580,15 +580,15 @@ docker exec proxy-nginx nginx -s reload
 
 ```bash
 # Test certificate validity
-curl -v https://reportforge.bitsync.it/health 2>&1 | grep "subject:"
-# → subject: CN=reportforge.bitsync.it
+curl -v https://reportforge.brainaihub.tech/health 2>&1 | grep "subject:"
+# → subject: CN=reportforge.brainaihub.tech
 
 # Test expiry date
-curl -v https://reportforge.bitsync.it/health 2>&1 | grep "expire date:"
+curl -v https://reportforge.brainaihub.tech/health 2>&1 | grep "expire date:"
 # → expire date: Apr  8 08:00:07 2026 GMT
 
 # Test TLS version
-curl -v https://reportforge.bitsync.it/health 2>&1 | grep "SSL connection"
+curl -v https://reportforge.brainaihub.tech/health 2>&1 | grep "SSL connection"
 # → SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
 ```
 
@@ -628,6 +628,117 @@ curl -v https://reportforge.bitsync.it/health 2>&1 | grep "SSL connection"
 - **Docker Docs**: https://docs.docker.com/compose/
 - **FastAPI Docs**: https://fastapi.tiangolo.com/
 - **SQLAlchemy**: https://docs.sqlalchemy.org/
+
+---
+
+## 📧 Amazon SES Configuration (Production)
+
+**Service**: Amazon Simple Email Service (SES)  
+**Region**: eu-west-1 (Ireland)  
+**Domain**: brainaihub.tech  
+**Updated**: 2026-01-08
+
+### SMTP Credentials
+
+```bash
+# Email Server
+SES_SMTP_HOST=email-smtp.eu-west-1.amazonaws.com
+
+# Ports Available
+SES_SMTP_PORT=587                    # STARTTLS (recommended)
+# Alternative ports: 25, 2587 (STARTTLS) or 465, 2465 (TLS Wrapper)
+
+# Authentication
+SES_SMTP_USERNAME=AKIAXCYNJR3PTEZMNKKU
+SES_SMTP_PASSWORD=BL/dFzoUubluz5kz4HkrYl6BUhpZ0BfXj3prNF9QC21b
+
+# AWS API Credentials (for boto3)
+AWS_ACCESS_KEY_ID=AKIAXCYNJR3PTEZMNKKU
+AWS_SECRET_ACCESS_KEY=BL/dFzoUubluz5kz4HkrYl6BUhpZ0BfXj3prNF9QC21b
+AWS_REGION=eu-west-1
+
+# Sender Configuration
+SES_SENDER_EMAIL=noreply@brainaihub.tech
+SES_SENDER_NAME=ReportForge
+```
+
+### Environment Variables (.env)
+
+Add to `/opt/reportforge/.env`:
+
+```bash
+# Amazon SES Email Configuration
+AWS_ACCESS_KEY_ID=AKIAXCYNJR3PTEZMNKKU
+AWS_SECRET_ACCESS_KEY=BL/dFzoUubluz5kz4HkrYl6BUhpZ0BfXj3prNF9QC21b
+AWS_REGION=eu-west-1
+SES_SMTP_HOST=email-smtp.eu-west-1.amazonaws.com
+SES_SMTP_PORT=587
+SES_SENDER_EMAIL=noreply@brainaihub.tech
+SES_SENDER_NAME=ReportForge
+
+# Magic Link Configuration
+MAGIC_LINK_SUBJECT=Your ReportForge Magic Link
+MAGIC_LINK_EXPIRY_MINUTES=15
+```
+
+### Domain Verification
+
+**Status**: ✅ Verified (by user)  
+**Domain**: brainaihub.tech  
+**Email**: noreply@brainaihub.tech
+
+**DNS Records** (already configured by user):
+- Domain verification TXT record
+- DKIM CNAME records (3x)
+- SPF record (optional but recommended)
+
+### Python Dependencies
+
+```txt
+# requirements.txt
+boto3==1.34.28          # AWS SDK for Python
+botocore==1.34.28       # AWS SDK core
+```
+
+### Usage Example
+
+```python
+from app.services.email_service import email_service
+
+# Send magic link
+success = email_service.send_magic_link(
+    to_email="user@infocert.it",
+    magic_link="https://reportforge.brainaihub.tech/auth/verify?token=abc123"
+)
+```
+
+### Email Template (HTML)
+
+- **Branding**: Tinexta InfoCert colors (#0072CE)
+- **CTA Button**: Access Dashboard
+- **Expiry Notice**: 15 minutes
+- **Footer**: ReportForge by Tinexta InfoCert
+
+### Testing
+
+```bash
+# Test email sending
+docker-compose exec backend python -c "
+from app.services.email_service import email_service
+result = email_service.send_magic_link(
+    'test@example.com',
+    'https://reportforge.brainaihub.tech/auth/verify?token=test123'
+)
+print(f'Email sent: {result}')
+"
+```
+
+### SES Limits
+
+**Sandbox Mode**: 200 emails/day  
+**Production Mode**: Request limit increase via AWS Support
+
+**Important**: If SES account is in sandbox, you must verify recipient emails before sending.
 
 ---
 

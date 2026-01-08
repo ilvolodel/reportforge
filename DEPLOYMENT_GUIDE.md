@@ -5,7 +5,7 @@ Complete guide for deploying ReportForge on the DigitalOcean droplet.
 ## 📋 Prerequisites
 
 - Droplet: `161.35.214.46` (SSH: `root@10.135.215.172`)
-- Domain: `reportforge.bitsync.it` → pointing to droplet IP
+- Domain: `reportforge.brainaihub.tech` → pointing to droplet IP
 - Docker & Docker Compose installed on droplet
 - Main nginx proxy already running on droplet (for SSL/routing)
 
@@ -52,7 +52,7 @@ SMTP_PASSWORD=your_smtp_app_password
 SMTP_FROM=ReportForge <noreply@infocert.it>
 
 # Application
-APP_URL=https://reportforge.bitsync.it
+APP_URL=https://reportforge.brainaihub.tech
 DEBUG=false
 ENVIRONMENT=production
 ```
@@ -89,7 +89,7 @@ The droplet has a main nginx that handles SSL and routes traffic. We need to add
 
 ```bash
 # Create nginx config for ReportForge
-nano /etc/nginx/sites-available/reportforge.bitsync.it
+nano /etc/nginx/sites-available/reportforge.brainaihub.tech
 ```
 
 **Add this configuration:**
@@ -101,7 +101,7 @@ upstream reportforge_backend {
 
 server {
     listen 80;
-    server_name reportforge.bitsync.it;
+    server_name reportforge.brainaihub.tech;
     
     # Redirect to HTTPS
     return 301 https://$server_name$request_uri;
@@ -109,12 +109,12 @@ server {
 
 server {
     listen 443 ssl http2;
-    server_name reportforge.bitsync.it;
+    server_name reportforge.brainaihub.tech;
 
     # SSL certificates (update paths if needed)
-    ssl_certificate /etc/letsencrypt/live/reportforge.bitsync.it/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/reportforge.bitsync.it/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/reportforge.bitsync.it/chain.pem;
+    ssl_certificate /etc/letsencrypt/live/reportforge.brainaihub.tech/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/reportforge.brainaihub.tech/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/reportforge.brainaihub.tech/chain.pem;
 
     # SSL settings
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -158,7 +158,7 @@ server {
 
 ```bash
 # Enable site
-ln -s /etc/nginx/sites-available/reportforge.bitsync.it /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/reportforge.brainaihub.tech /etc/nginx/sites-enabled/
 
 # Test nginx configuration
 nginx -t
@@ -175,7 +175,7 @@ apt-get update
 apt-get install -y certbot python3-certbot-nginx
 
 # Get SSL certificate
-certbot --nginx -d reportforge.bitsync.it
+certbot --nginx -d reportforge.brainaihub.tech
 
 # Certbot will automatically configure nginx
 # Follow prompts to set up auto-renewal
@@ -206,12 +206,12 @@ reportforge-nginx       Up (healthy)        0.0.0.0:8080->80/tcp
 curl http://localhost:8080/health
 
 # Test external access
-curl https://reportforge.bitsync.it/health
+curl https://reportforge.brainaihub.tech/health
 ```
 
 ## 📊 Step 7: Access Application
 
-Open browser: **https://reportforge.bitsync.it**
+Open browser: **https://reportforge.brainaihub.tech**
 
 You should see the login page.
 
@@ -337,14 +337,14 @@ docker-compose ps nginx
 netstat -tulpn | grep 8080
 
 # Check DNS
-nslookup reportforge.bitsync.it
+nslookup reportforge.brainaihub.tech
 ```
 
 ### SSL certificate issues
 
 ```bash
 # Check certificate
-openssl s_client -connect reportforge.bitsync.it:443 -servername reportforge.bitsync.it
+openssl s_client -connect reportforge.brainaihub.tech:443 -servername reportforge.brainaihub.tech
 
 # Renew certificate
 certbot renew --nginx
@@ -383,7 +383,7 @@ For other SMTP providers:
 ## 🎯 Next Steps
 
 Once deployed:
-1. Access https://reportforge.bitsync.it
+1. Access https://reportforge.brainaihub.tech
 2. Enter your email for magic link
 3. Check email and click link to login
 4. Start adding projects and data

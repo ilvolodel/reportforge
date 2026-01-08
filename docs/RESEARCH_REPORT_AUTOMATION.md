@@ -27,7 +27,7 @@
 6. **Autenticazione** tramite Magic Link (senza password)
 
 ### 🌐 Status Deployment
-- **URL**: https://reportforge.bitsync.it ✅
+- **URL**: https://reportforge.brainaihub.tech ✅
 - **Backend**: Operativo con 19 tabelle database
 - **SSL**: Certificato Let's Encrypt valido
 - **Server**: Droplet DigitalOcean in produzione
@@ -249,7 +249,7 @@ HTML(string=html_content).write_pdf('report_gennaio_2026.pdf')
 
 ### 5. **Testing e deploy**
    - Test con dati reali Gennaio 2026
-   - Deploy automatico su https://reportforge.bitsync.it
+   - Deploy automatico su https://reportforge.brainaihub.tech
 
 ---
 
@@ -289,7 +289,7 @@ HTML(string=html_content).write_pdf('report_gennaio_2026.pdf')
 - **WeasyPrint docs**: https://doc.courtbouillon.org/weasyprint/
 - **Jinja2 templates**: https://jinja.palletsprojects.com/
 - **ReportForge GitHub**: https://github.com/ilvolodel/reportforge
-- **ReportForge Live**: https://reportforge.bitsync.it
+- **ReportForge Live**: https://reportforge.brainaihub.tech
 
 ---
 

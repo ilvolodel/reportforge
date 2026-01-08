@@ -100,7 +100,7 @@ if docker exec reportforge-backend curl -f http://localhost:8030/health > /dev/n
     echo "   Backend API:    http://localhost:8030"
     echo "   Health check:   /health"
     echo "   API docs:       /docs"
-    echo "   Public URL:     https://reportforge.bitsync.it/"
+    echo "   Public URL:     https://reportforge.brainaihub.tech/"
     echo ""
     echo "📋 Logs:"
     echo "   docker logs -f reportforge-backend"

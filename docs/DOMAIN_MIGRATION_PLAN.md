@@ -2,7 +2,7 @@
 
 ## Cambio Dominio
 
-**Da**: `reportforge.bitsync.it`  
+**Da**: `reportforge.brainaihub.tech`  
 **A**: `reportforge.brainaihub.tech`
 
 ---
@@ -47,14 +47,14 @@ dig reportforge.brainaihub.tech +short
 **File: `.env`**
 ```bash
 # OLD
-APP_URL=https://reportforge.bitsync.it
+APP_URL=https://reportforge.brainaihub.tech
 
 # NEW
 APP_URL=https://reportforge.brainaihub.tech
 ```
 
-**File: `nginx/conf.d/reportforge.bitsync.it.conf`**
-- ❌ **Eliminare**: `reportforge.bitsync.it.conf`
+**File: `nginx/conf.d/reportforge.brainaihub.tech.conf`**
+- ❌ **Eliminare**: `reportforge.brainaihub.tech.conf`
 - ✅ **Creare**: `reportforge.brainaihub.tech.conf`
 - Modificare:
   ```nginx
@@ -74,7 +74,7 @@ APP_URL=https://reportforge.brainaihub.tech
 **Modifica**:
 ```nginx
 # OLD
-reportforge.bitsync.it           reportforge-nginx:443;
+reportforge.brainaihub.tech           reportforge-nginx:443;
 
 # NEW
 reportforge.brainaihub.tech      reportforge-nginx:443;
@@ -94,7 +94,7 @@ docker-compose restart nginx
 
 #### 3.2 Certificati SSL Let's Encrypt
 
-**Importante**: Certificati attuali sono per `reportforge.bitsync.it` e scadono **2026-04-08**.
+**Importante**: Certificati attuali sono per `reportforge.brainaihub.tech` e scadono **2026-04-08**.
 
 **Azione**: Generare nuovi certificati per `reportforge.brainaihub.tech`
 
@@ -146,7 +146,7 @@ nano .env
 
 # Update nginx config
 cd nginx/conf.d
-mv reportforge.bitsync.it.conf reportforge.brainaihub.tech.conf
+mv reportforge.brainaihub.tech.conf reportforge.brainaihub.tech.conf
 nano reportforge.brainaihub.tech.conf
 # Aggiornare server_name e ssl_certificate paths
 
@@ -506,7 +506,7 @@ graph TD
 ```bash
 #!/bin/bash
 
-OLD_DOMAIN="reportforge.bitsync.it"
+OLD_DOMAIN="reportforge.brainaihub.tech"
 NEW_DOMAIN="reportforge.brainaihub.tech"
 
 echo "🔄 ReportForge Domain Migration"
@@ -575,7 +575,7 @@ echo "=================================="
 # 1. Update proxy-nginx
 echo "📝 Updating proxy-nginx..."
 sshpass -p "$DROPLET_PASS" ssh -o StrictHostKeyChecking=no $DROPLET_USER@$DROPLET_IP << 'EOF'
-    sed -i "s|reportforge.bitsync.it|reportforge.brainaihub.tech|g" /opt/proxy-nginx/nginx/nginx.conf
+    sed -i "s|reportforge.brainaihub.tech|reportforge.brainaihub.tech|g" /opt/proxy-nginx/nginx/nginx.conf
     cd /opt/proxy-nginx
     docker-compose restart nginx
     echo "✅ Proxy updated and restarted"

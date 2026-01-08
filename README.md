@@ -72,7 +72,7 @@ chmod +x deploy.sh
 sudo ./deploy.sh
 
 # Application will be available at:
-# https://reportforge.bitsync.it
+# https://reportforge.brainaihub.tech
 ```
 
 ## 📋 Database Schema
@@ -117,7 +117,7 @@ SMTP_PASSWORD=your_smtp_password
 SMTP_FROM=ReportForge <noreply@infocert.it>
 
 # Application
-APP_URL=https://reportforge.bitsync.it
+APP_URL=https://reportforge.brainaihub.tech
 ```
 
 ## 🐳 Docker Services
