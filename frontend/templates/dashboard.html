@@ -48,15 +48,29 @@
             margin-bottom: 1rem;
         }
         
-        .logo h1 {
-            font-size: 1.5rem;
-            color: var(--infocert-blue);
-            margin-bottom: 0.25rem;
+        .logo-main {
+            width: 100%;
+            max-width: 180px;
+            margin-bottom: 0.75rem;
         }
         
-        .logo p {
-            font-size: 0.75rem;
+        .logo-subtitle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-top: 0.5rem;
+        }
+        
+        .logo-subtitle span {
+            font-size: 0.7rem;
             color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .logo-tinexta {
+            max-width: 80px;
+            opacity: 0.8;
         }
         
         .nav-menu {
@@ -359,8 +373,11 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="logo">
-            <h1>📊 ReportForge</h1>
-            <p>Tinexta InfoCert</p>
+            <img src="/static/assets/infocert-logo.svg" alt="InfoCert" class="logo-main">
+            <div class="logo-subtitle">
+                <span>powered by</span>
+                <img src="/static/assets/tinexta-logo-official.svg" alt="Tinexta" class="logo-tinexta">
+            </div>
         </div>
         
         <ul class="nav-menu">

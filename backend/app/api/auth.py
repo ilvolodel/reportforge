@@ -50,6 +50,35 @@ INVALID_LINK_HTML = """
 </html>
 """
 
+# HTML template for successful login with auto-redirect
+SUCCESS_LOGIN_HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Success - ReportForge</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #0072CE 0%, #005a9e 100%); color: white; }
+        .container { background: white; color: #333; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #28a745; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #0072CE; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Accesso effettuato con successo!</h1>
+        <div class="spinner"></div>
+        <p>Reindirizzamento alla dashboard...</p>
+    </div>
+    <script>
+        // Immediate redirect to dashboard (handles browser double-request issue)
+        window.location.href = '/dashboard';
+    </script>
+</body>
+</html>
+"""
+
 
 def get_db():
     db = SessionLocal()
@@ -210,6 +239,10 @@ async def verify_magic_link(
                         samesite="lax"
                     )
                     return redirect_response
+                else:
+                    # Session not found, but link recently used - show error page with auto-redirect
+                    logger.warning(f"⚠️ Session not found for recently used link, returning error page with auto-redirect")
+                    return HTMLResponse(content=INVALID_LINK_HTML, status_code=400)
         
         # Check if token is valid and not expired
         if magic_link.is_used or magic_link.expires_at <= now_utc:
