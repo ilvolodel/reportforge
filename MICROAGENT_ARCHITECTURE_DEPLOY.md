@@ -4,8 +4,8 @@
 This microagent documents the **proven architecture patterns** and **deployment procedures** for ReportForge, based on the successful TrustyVault reference implementation running on the same droplet.
 
 **Last Updated**: 2026-01-08  
-**Status**: ✅ DEPLOYED & FULLY OPERATIONAL WITH HTTPS  
-**Current Commit**: 70dd893  
+**Status**: ✅ DEPLOYED & FULLY OPERATIONAL WITH HTTPS + LOGIN PAGE COMPLETE  
+**Current Commit**: 37e673c  
 **Public URL**: https://reportforge.brainaihub.tech
 
 ---
@@ -739,30 +739,280 @@ curl -v https://reportforge.brainaihub.tech/health 2>&1 | grep "SSL connection"
 
 ---
 
-## 🎯 Next Steps
+## 🎯 Development Roadmap
 
-1. **✅ COMPLETED: Configure HTTPS with SSL certificates** (Task 13)
-   - ✅ Generated Let's Encrypt certificate
-   - ✅ Configured nginx for HTTPS
-   - ✅ Set up SNI routing in proxy-nginx
-   - ✅ Verified public HTTPS access
+### ✅ PHASE 1: Infrastructure & Design (COMPLETED)
 
-2. **Implement Magic Link authentication** (Task 15)
-   - Email sending with aiosmtplib
-   - Token generation and validation
-   - Session management
+**Task 1-13**: Basic Infrastructure Setup
+- ✅ Docker setup (FastAPI + PostgreSQL + Nginx)
+- ✅ Database schema (19 tables)
+- ✅ HTTPS/SSL configuration
+- ✅ Domain migration to reportforge.brainaihub.tech
+- ✅ Health check endpoints
 
-3. **Build CRUD APIs** (Task 11)
-   - Projects endpoints
-   - Team members management
-   - Financial data entry
-   - Report generation
+**Task 14-23**: Frontend Branding & Login Page
+- ✅ Login page HTML/CSS with Tailwind
+- ✅ Official Tinexta InfoCert logo integration
+- ✅ ReportForge branding (#0072CE blue)
+- ✅ Responsive design
+- ✅ Magic Link login form UI
+- ✅ **CRITICAL FIX**: Logo file deployment issue resolved
+  - **Issue**: SVG file showed "Access Denied" XML error instead of logo
+  - **Root Cause**: Docker build cached old file, `git pull` didn't update container
+  - **Solution**: Used `docker cp` to inject correct logo directly into running container
+  - **Files Fixed**: `frontend/static/assets/tinexta-logo-official.svg`
+  - **Commit**: 37e673c - "Use official Tinexta InfoCert logo from TrustyVault"
 
-4. **Frontend dashboard** (Task 14)
-   - Login page
-   - Admin UI with Tailwind CSS
-   - CRUD forms
-   - PDF preview/download
+---
+
+### 🔄 PHASE 2: Authentication System (IN PROGRESS)
+
+**Task 24**: Implement Magic Link Backend (2-3 hours)
+1. **Email Service Implementation**
+   - Configure AWS SES client with boto3
+   - Create HTML email template (Jinja2)
+   - Implement `email_service.send_magic_link()`
+   - Add email logging for debugging
+   
+2. **Magic Link Generation**
+   - Create `/api/auth/request-magic-link` POST endpoint
+   - Validate email domain (@infocert.it only)
+   - Generate secure token (secrets.token_urlsafe(32))
+   - Store token in `magic_links` table with 15min expiry
+   - Send email with token link
+   
+3. **Token Verification**
+   - Create `/api/auth/verify` GET endpoint
+   - Validate token existence and expiry
+   - Create/update user record
+   - Generate session token (30 days)
+   - Store in `user_sessions` table
+   - Set httponly cookie
+   - Redirect to dashboard
+
+**Files to Modify**:
+```
+backend/app/services/email_service.py     # NEW: Email sending logic
+backend/app/api/auth.py                   # NEW: Auth endpoints
+backend/app/templates/email_magic_link.html  # NEW: Email template
+backend/app/models/user.py                # EXISTING: User, MagicLink, UserSession
+backend/app/main.py                       # UPDATE: Register auth router
+```
+
+**Environment Variables Required** (.env):
+```bash
+AWS_ACCESS_KEY_ID=AKIAXCYNJR3PTEZMNKKU
+AWS_SECRET_ACCESS_KEY=BL/dFzoUubluz5kz4HkrYl6BUhpZ0BfXj3prNF9QC21b
+AWS_REGION=eu-west-1
+SES_SENDER_EMAIL=noreply@brainaihub.tech
+SECRET_KEY=<generate-random-key>
+MAGIC_LINK_EXPIRY_MINUTES=15
+SESSION_EXPIRY_DAYS=30
+```
+
+**Testing Checklist**:
+- [ ] Email arrives within 30 seconds
+- [ ] Magic link format: `https://reportforge.brainaihub.tech/auth/verify?token=...`
+- [ ] Token expires after 15 minutes
+- [ ] Invalid token returns 401 error
+- [ ] Valid token creates user and session
+- [ ] Session cookie persists for 30 days
+- [ ] Second login reuses existing user
+
+---
+
+### 🏗️ PHASE 3: Complete API Implementation (8-10 hours)
+
+**Task 25**: Projects API (3 hours)
+- `POST /api/projects` - Create new project
+- `GET /api/projects` - List all projects (with pagination)
+- `GET /api/projects/{id}` - Get single project details
+- `PUT /api/projects/{id}` - Update project info
+- `DELETE /api/projects/{id}` - Soft delete project
+- **Models**: Project, TeamMember, Client, ProjectActivity
+
+**Task 26**: Financial Data API (3 hours)
+- `POST /api/subscriptions` - Add subscription revenue
+- `POST /api/revenue/onetime` - Add one-time revenue
+- `GET /api/subscriptions` - List all subscriptions
+- `PUT /api/subscriptions/{id}` - Update subscription
+- `DELETE /api/subscriptions/{id}` - Delete subscription
+- **Models**: Subscription, RevenueOneTime
+
+**Task 27**: Clients API (2 hours)
+- `POST /api/clients` - Create client
+- `GET /api/clients` - List all clients
+- `PUT /api/clients/{id}` - Update client
+- **Models**: Client, ClientContact
+
+**Task 28**: Reports API (2 hours)
+- `GET /api/reports` - List all report versions
+- `POST /api/reports/generate` - Generate new monthly report
+- `GET /api/reports/{id}/pdf` - Download PDF
+- **Models**: ReportVersion
+
+**Shared Requirements**:
+- Authentication middleware (check session cookie)
+- Authorization (user can only access their division's data)
+- Input validation (Pydantic schemas)
+- Error handling (404, 403, 400, 500)
+- Database transactions
+- Audit logging (created_by, updated_by)
+
+---
+
+### 🎨 PHASE 4: Dashboard Frontend (10-12 hours)
+
+**Task 29**: Dashboard Layout (2 hours)
+- Responsive sidebar navigation
+- Top bar with user profile
+- Logout button
+- Mobile menu toggle
+- Active route highlighting
+
+**Task 30**: Projects Management Page (3 hours)
+- Projects table with filters/search
+- Add new project modal
+- Edit project modal
+- Delete confirmation
+- Team members inline editing
+- Client selection dropdown
+
+**Task 31**: Financial Data Entry Page (3 hours)
+- Subscriptions table
+- One-time revenue table
+- Inline editing with validation
+- Add/Edit forms
+- Date pickers
+- Currency formatting
+
+**Task 32**: Report Preview & Generation (2 hours)
+- Report history table
+- Generate report button
+- PDF preview iframe
+- Download PDF button
+- Status indicators (generating, ready)
+
+**Task 33**: Settings Page (2 hours)
+- User profile editing
+- Email preferences
+- Report templates management
+- Division settings
+
+**Technology Stack**:
+- HTML/CSS with Tailwind CSS
+- Vanilla JavaScript (Alpine.js optional)
+- Fetch API for backend calls
+- Client-side form validation
+- Toast notifications
+
+---
+
+### 📄 PHASE 5: PDF Generation Engine (6-8 hours)
+
+**Task 34**: PPTX Data Extraction (2 hours)
+- Parse existing `template.pptx` with python-pptx
+- Extract layout/structure information
+- Map PPTX content to database fields
+- Document data mapping in spreadsheet
+
+**Task 35**: HTML Template Creation (3 hours)
+- Convert PPTX design to HTML/CSS
+- Use Jinja2 templating
+- Match Tinexta InfoCert branding exactly
+- Include charts (Chart.js to SVG)
+- Tables with proper formatting
+- Page breaks for PDF
+
+**Task 36**: WeasyPrint Integration (2 hours)
+- Configure WeasyPrint with fonts
+- Render HTML to PDF
+- Handle images and logos
+- Test page layouts
+- Optimize file size
+
+**Task 37**: Report Generator Service (1 hour)
+- Create `ReportGeneratorService`
+- Query all data for date range
+- Populate Jinja2 template
+- Generate PDF bytes
+- Save to `ReportVersion` table
+- Return download link
+
+---
+
+### 🧪 PHASE 6: Testing & Polish (4-6 hours)
+
+**Task 38**: Integration Testing (2 hours)
+- Test full user flow (login → add data → generate report)
+- Test edge cases (empty data, large datasets)
+- Test concurrent users
+- Load testing (10+ users)
+
+**Task 39**: Error Handling & UX (2 hours)
+- User-friendly error messages
+- Loading states
+- Empty states
+- Validation feedback
+- Success notifications
+
+**Task 40**: Documentation (2 hours)
+- User guide (Italian)
+- Admin guide
+- API documentation (OpenAPI)
+- Deployment guide updates
+
+---
+
+### 🚀 PHASE 7: Production Deployment (2 hours)
+
+**Task 41**: Pre-launch Checklist
+- [ ] All environment variables set
+- [ ] Database backup configured
+- [ ] SSL certificates renewed
+- [ ] Email sending tested
+- [ ] Monitoring/logging enabled
+- [ ] Error alerting configured
+
+**Task 42**: User Training
+- Demo session with PM
+- Walkthrough of all features
+- Q&A session
+- Feedback collection
+
+**Task 43**: Launch & Support
+- Soft launch to PM only
+- Monitor for issues
+- Collect feedback
+- Iterate on UX improvements
+
+---
+
+## 📊 Effort Estimation Summary
+
+| Phase | Tasks | Estimated Hours | Status |
+|-------|-------|----------------|--------|
+| Phase 1: Infrastructure | 1-23 | 20 hours | ✅ DONE |
+| Phase 2: Authentication | 24 | 3 hours | 🔄 NEXT |
+| Phase 3: API | 25-28 | 10 hours | ⏳ TODO |
+| Phase 4: Dashboard | 29-33 | 12 hours | ⏳ TODO |
+| Phase 5: PDF Engine | 34-37 | 8 hours | ⏳ TODO |
+| Phase 6: Testing | 38-40 | 6 hours | ⏳ TODO |
+| Phase 7: Launch | 41-43 | 2 hours | ⏳ TODO |
+| **TOTAL** | **43 tasks** | **61 hours** | **38% complete** |
+
+---
+
+## 🎯 Immediate Next Steps (Priority Order)
+
+1. **✅ VERIFY**: Logo displays correctly on https://reportforge.brainaihub.tech/
+2. **START Task 24**: Implement Magic Link authentication backend (3 hours)
+   - Configure AWS SES
+   - Create email template
+   - Build auth endpoints
+   - Test email flow
+3. **START Task 25**: Build Projects CRUD API (3 hours)
+4. **START Task 29**: Build dashboard layout (2 hours)
 
 ---
 
