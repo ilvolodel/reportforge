@@ -15,7 +15,7 @@ class User(Base):
     full_name = Column(String(255))
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    last_login = Column(DateTime(timezone=True))
+    last_login_at = Column(DateTime(timezone=True))
     
     # Relationships
     magic_links = relationship("MagicLink", back_populates="user", cascade="all, delete-orphan")
@@ -32,6 +32,7 @@ class MagicLink(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     token = Column(String(255), unique=True, nullable=False, index=True)
     expires_at = Column(DateTime(timezone=True), nullable=False)
+    is_used = Column(Boolean, default=False, nullable=False)
     used_at = Column(DateTime(timezone=True))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
@@ -48,6 +49,7 @@ class UserSession(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     session_token = Column(String(255), unique=True, nullable=False, index=True)
     expires_at = Column(DateTime(timezone=True), nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
