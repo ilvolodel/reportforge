@@ -42,6 +42,8 @@ class EmailService:
         Returns:
             True if email sent successfully, False otherwise
         """
+        logger.info(f"🔄 Starting email send process for {to_email}")
+        logger.info(f"📧 SMTP Config: {self.smtp_host}:{self.smtp_port}, user={self.smtp_username[:10]}...")
         try:
             # Load and render email template
             template = self.jinja_env.get_template("magic_link.html")
