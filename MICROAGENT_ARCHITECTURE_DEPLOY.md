@@ -5,8 +5,149 @@ This microagent documents the **proven architecture patterns** and **deployment 
 
 **Last Updated**: 2026-01-08  
 **Status**: ✅ DEPLOYED & FULLY OPERATIONAL WITH HTTPS  
-**Current Commit**: 874f17f  
+**Current Commit**: 70dd893  
 **Public URL**: https://reportforge.brainaihub.tech
+
+---
+
+## 🚨 CRITICAL RULES - READ FIRST!
+
+### ❌ NEVER DO THIS:
+1. **NEVER modify `/opt/proxy-nginx/nginx/nginx.conf` or files in `/opt/proxy-nginx/nginx/conf.d/`**
+   - proxy-nginx is a SHARED service routing ALL applications on the droplet
+   - Modifying it can break TrustyVault, PEC, MS365, Documents, TrustySign, and ALL other services
+   - The proxy uses SNI (Server Name Indication) routing - it's NOT a traditional nginx reverse proxy
+
+2. **NEVER restart proxy-nginx without explicit user approval**
+   - Restarting affects ALL services on the entire droplet
+   - If proxy-nginx breaks, the ENTIRE infrastructure goes down
+
+3. **NEVER create config files in `/opt/proxy-nginx/nginx/conf.d/`**
+   - SNI routing works differently - it reads hostnames from the main `nginx.conf` stream block
+   - Adding traditional `server {}` blocks will cause conflicts and crashes
+
+### ✅ ALWAYS DO THIS:
+1. **ALWAYS use FULL container names in ALL configurations**
+   - Database: `reportforge-db` (NOT `postgres` or `db`)
+   - Backend: `reportforge-backend` (NOT `backend` or `app`)
+   - Nginx: `reportforge-nginx` (NOT `nginx` or `web`)
+
+2. **ALWAYS check logs before making changes**
+   ```bash
+   # Check nginx logs
+   docker logs reportforge-nginx --tail 50
+   cat /opt/reportforge/logs/nginx/error.log | tail -20
+   
+   # Check backend logs
+   docker logs reportforge-backend --tail 50
+   
+   # Check proxy logs (only if needed)
+   docker logs proxy-nginx --tail 50
+   ```
+
+3. **ALWAYS verify container names match in ALL files**
+   - `docker-compose.yml` defines: `container_name: reportforge-backend`
+   - `.env` must use: `DATABASE_URL=postgresql://...@reportforge-db:5432/...`
+   - `nginx/conf.d/*.conf` must use: `proxy_pass http://reportforge-backend:8030;`
+   - `entrypoint.sh` must use: `pg_isready -h reportforge-db ...`
+
+---
+
+## 🔍 Common Issues & Solutions
+
+### Issue: 502 Bad Gateway
+**Symptoms**: `curl https://reportforge.brainaihub.tech/` returns 502
+
+**Diagnosis**:
+```bash
+# Step 1: Check nginx error logs
+cat /opt/reportforge/logs/nginx/error.log | tail -20
+
+# Step 2: Look for "Connection refused" errors
+# Example error: "connect() failed (111: Connection refused) while connecting to upstream, 
+#                 upstream: "http://172.19.0.10:8030/""
+```
+
+**Root Causes**:
+1. **Wrong container name in nginx config** (MOST COMMON!)
+   - Error shows: `upstream: "http://172.19.0.10:8030/"` (IP instead of hostname)
+   - Fix: Check `nginx/conf.d/*.conf` uses `reportforge-backend:8030` NOT `backend:8030`
+
+2. **Backend container not running**
+   ```bash
+   docker ps --filter name=reportforge-backend
+   # If not running: docker compose up -d backend
+   ```
+
+3. **Backend not listening on port 8030**
+   ```bash
+   docker exec reportforge-backend netstat -tlnp | grep 8030
+   # Should show uvicorn listening
+   ```
+
+**Solution**:
+```bash
+# Fix nginx config
+sed -i 's/http:\/\/backend:8030/http:\/\/reportforge-backend:8030/g' \
+    nginx/conf.d/reportforge.brainaihub.tech.conf
+
+# Verify
+grep proxy_pass nginx/conf.d/*.conf
+# Should show: proxy_pass http://reportforge-backend:8030;
+
+# Deploy
+git add nginx/conf.d/ && git commit -m "Fix nginx upstream name" && git push
+ssh root@10.135.215.172 "cd /opt/reportforge && git pull && docker compose restart nginx"
+```
+
+### Issue: Database Connection Failed
+**Symptoms**: Backend logs show `could not connect to server` or `Connection refused`
+
+**Root Cause**: Wrong hostname in `DATABASE_URL`
+
+**Solution**:
+```bash
+# Check .env file on server
+ssh root@10.135.215.172 "grep DATABASE_URL /opt/reportforge/.env"
+
+# Must be: postgresql://reportforge:PASSWORD@reportforge-db:5432/reportforge
+# NOT:     postgresql://reportforge:PASSWORD@postgres:5432/reportforge
+# NOT:     postgresql://reportforge:PASSWORD@db:5432/reportforge
+# NOT:     postgresql://reportforge:PASSWORD@localhost:5432/reportforge
+
+# If wrong, fix it:
+ssh root@10.135.215.172
+nano /opt/reportforge/.env
+# Change database hostname to: reportforge-db
+docker compose restart backend
+```
+
+### Issue: Proxy-nginx Down (Connection Reset)
+**Symptoms**: ALL services on brainaihub.tech return connection errors
+
+**Emergency Rollback**:
+```bash
+# 1. Check what was changed
+ssh root@10.135.215.172
+cd /opt/proxy-nginx/nginx/conf.d
+ls -la
+# Look for new/modified files
+
+# 2. Remove any new files you created
+rm /opt/proxy-nginx/nginx/conf.d/reportforge.conf  # If you created this
+
+# 3. Restart proxy
+docker restart proxy-nginx
+
+# 4. Wait 10 seconds and verify
+sleep 10
+curl -I https://trustyvault.brainaihub.tech/  # Should return 200 or 404, NOT connection error
+```
+
+**Prevention**: 
+- NEVER create files in `/opt/proxy-nginx/nginx/conf.d/`
+- SNI routing is configured ONLY in `/opt/proxy-nginx/nginx/nginx.conf` stream block
+- If you need to add reportforge to proxy, user must manually add it to the stream map
 
 ---
 
@@ -42,11 +183,15 @@ reportforge-nginx  reportforge-backend  reportforge-db
    - ❌ NO separate `internal` network
    - **Why**: Simpler networking, DNS resolution works reliably, easier debugging
 
-2. **Full Container Names for DNS**
-   - DATABASE_URL: `postgresql://user:pass@reportforge-db:5432/db`
-   - ✅ Use full container name: `reportforge-db`
-   - ❌ NOT short name: `postgres`
-   - **Why**: Guaranteed DNS resolution across Docker networks
+2. **Full Container Names for DNS - THIS IS CRITICAL!**
+   - ✅ **CORRECT**: `reportforge-db` (full container name from docker-compose.yml)
+   - ❌ **WRONG**: `postgres`, `db`, `backend`, `nginx` (service names - DO NOT USE!)
+   - **Why**: Docker DNS uses container_name, NOT service name
+   - **Where to use**:
+     - `.env`: `DATABASE_URL=postgresql://user:pass@reportforge-db:5432/db`
+     - `nginx/*.conf`: `proxy_pass http://reportforge-backend:8030;`
+     - `entrypoint.sh`: `pg_isready -h reportforge-db -p 5432`
+   - **Real incident**: Using `backend:8030` instead of `reportforge-backend:8030` in nginx config caused 502 errors for entire day!
 
 3. **Simple Database Configuration**
    ```python
