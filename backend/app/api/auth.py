@@ -73,9 +73,9 @@ async def request_magic_link(
         # Generate secure token
         token = secrets.token_urlsafe(32)
         
-        # Calculate expiry time
+        # Calculate expiry time (use naive datetime in UTC for PostgreSQL compatibility)
         expiry_minutes = int(os.getenv("MAGIC_LINK_EXPIRY_MINUTES", "15"))
-        expires_at = datetime.now(timezone.utc) + timedelta(minutes=expiry_minutes)
+        expires_at = datetime.utcnow() + timedelta(minutes=expiry_minutes)
         
         # Save magic link to database
         magic_link = MagicLink(
@@ -139,7 +139,7 @@ async def verify_magic_link(
     """
     try:
         # Debug logging
-        now_utc = datetime.now(timezone.utc)
+        now_utc = datetime.utcnow()
         logger.info(f"🔍 Verifying token, current UTC time: {now_utc}")
         
         # Find magic link
@@ -186,7 +186,7 @@ async def verify_magic_link(
         
         # Mark magic link as used
         magic_link.is_used = True
-        magic_link.used_at = datetime.now(timezone.utc)
+        magic_link.used_at = datetime.utcnow()
         
         # Get user
         user = db.query(User).filter(User.id == magic_link.user_id).first()
@@ -194,12 +194,12 @@ async def verify_magic_link(
             raise HTTPException(status_code=403, detail="User not found or inactive")
         
         # Update user last login
-        user.last_login_at = datetime.now(timezone.utc)
+        user.last_login_at = datetime.utcnow()
         
         # Create session token
         session_token = secrets.token_urlsafe(48)
         session_expiry_days = int(os.getenv("SESSION_EXPIRY_DAYS", "30"))
-        session_expires_at = datetime.now(timezone.utc) + timedelta(days=session_expiry_days)
+        session_expires_at = datetime.utcnow() + timedelta(days=session_expiry_days)
         
         # Save session to database
         user_session = UserSession(
@@ -282,7 +282,7 @@ async def get_current_user(
         and_(
             UserSession.session_token == session_token,
             UserSession.is_active == True,
-            UserSession.expires_at > datetime.now(timezone.utc)
+            UserSession.expires_at > datetime.utcnow()
         )
     ).first()
     
