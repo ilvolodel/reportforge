@@ -6,7 +6,7 @@ from .database import engine, Base, SessionLocal
 # Import all models so they're registered with Base
 from .models.user import User, MagicLink, UserSession
 from .models.project import Project, TeamMember, Client
-from .models.subscription import Subscription, Revenue
+from .models.subscription import Subscription, RevenueOneTime, SubscriptionTransaction
 from .models.report import ReportVersion
 
 
