@@ -42,11 +42,9 @@ INVALID_LINK_HTML = """
         <p><a href="/">← Torna alla pagina di login</a></p>
     </div>
     <script>
-        // Auto-redirect to dashboard after 1 second (handles double-click/double-request issue)
+        // Auto-redirect to dashboard immediately (handles double-click/double-request issue)
         // If user has valid session cookie, dashboard will load, otherwise will redirect to login
-        setTimeout(() => {
-            window.location.href = '/dashboard';
-        }, 1000);
+        window.location.href = '/dashboard';
     </script>
 </body>
 </html>
