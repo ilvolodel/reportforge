@@ -62,6 +62,18 @@ async def root(request: Request):
         })
 
 
+@app.get("/dashboard")
+async def dashboard(request: Request):
+    """Dashboard page - main application interface."""
+    if templates:
+        # TODO: Add authentication check via session cookie
+        return templates.TemplateResponse("dashboard.html", {"request": request})
+    else:
+        return JSONResponse({
+            "error": "Templates not configured"
+        }, status_code=500)
+
+
 # Import and include API routers
 from .api import auth
 
