@@ -73,9 +73,9 @@ async def request_magic_link(
         # Generate secure token
         token = secrets.token_urlsafe(32)
         
-        # Calculate expiry time (use naive datetime in UTC for PostgreSQL compatibility)
+        # Calculate expiry time (use timezone-aware datetime in UTC)
         expiry_minutes = int(os.getenv("MAGIC_LINK_EXPIRY_MINUTES", "15"))
-        now_utc = datetime.utcnow()
+        now_utc = datetime.now(timezone.utc)
         expires_at = now_utc + timedelta(minutes=expiry_minutes)
         
         logger.info(f"⏰ Creating magic link - now_utc: {now_utc}, expires_at: {expires_at}")
@@ -142,7 +142,7 @@ async def verify_magic_link(
     """
     try:
         # Debug logging
-        now_utc = datetime.utcnow()
+        now_utc = datetime.now(timezone.utc)
         logger.info(f"🔍 Verifying token, current UTC time: {now_utc}")
         
         # Find magic link
@@ -189,7 +189,7 @@ async def verify_magic_link(
         
         # Mark magic link as used
         magic_link.is_used = True
-        magic_link.used_at = datetime.utcnow()
+        magic_link.used_at = datetime.now(timezone.utc)
         
         # Get user
         user = db.query(User).filter(User.id == magic_link.user_id).first()
@@ -197,12 +197,12 @@ async def verify_magic_link(
             raise HTTPException(status_code=403, detail="User not found or inactive")
         
         # Update user last login
-        user.last_login_at = datetime.utcnow()
+        user.last_login_at = datetime.now(timezone.utc)
         
         # Create session token
         session_token = secrets.token_urlsafe(48)
         session_expiry_days = int(os.getenv("SESSION_EXPIRY_DAYS", "30"))
-        session_expires_at = datetime.utcnow() + timedelta(days=session_expiry_days)
+        session_expires_at = datetime.now(timezone.utc) + timedelta(days=session_expiry_days)
         
         # Save session to database
         user_session = UserSession(
