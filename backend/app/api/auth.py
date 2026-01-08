@@ -138,16 +138,26 @@ async def verify_magic_link(
     Returns redirect to dashboard on success
     """
     try:
+        # Debug logging
+        now_utc = datetime.now(timezone.utc)
+        logger.info(f"🔍 Verifying token, current UTC time: {now_utc}")
+        
         # Find magic link
         magic_link = db.query(MagicLink).filter(
             and_(
                 MagicLink.token == token,
                 MagicLink.is_used == False,
-                MagicLink.expires_at > datetime.now(timezone.utc)
+                MagicLink.expires_at > now_utc
             )
         ).first()
         
         if not magic_link:
+            # Check if token exists at all
+            any_link = db.query(MagicLink).filter(MagicLink.token == token).first()
+            if any_link:
+                logger.warning(f"⚠️ Token found but invalid - is_used: {any_link.is_used}, expires_at: {any_link.expires_at}, now: {now_utc}")
+            else:
+                logger.warning(f"⚠️ Token not found in database")
             return HTMLResponse(
                 content="""
                 <!DOCTYPE html>
