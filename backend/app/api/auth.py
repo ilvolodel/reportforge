@@ -145,22 +145,66 @@ async def verify_magic_link(
         now_utc = datetime.now(timezone.utc)
         logger.info(f"🔍 Verifying token, current UTC time: {now_utc}")
         
-        # Find magic link
-        magic_link = db.query(MagicLink).filter(
-            and_(
-                MagicLink.token == token,
-                MagicLink.is_used == False,
-                MagicLink.expires_at > now_utc
-            )
-        ).first()
+        # Find magic link (check both unused and recently used)
+        magic_link = db.query(MagicLink).filter(MagicLink.token == token).first()
         
         if not magic_link:
-            # Check if token exists at all
-            any_link = db.query(MagicLink).filter(MagicLink.token == token).first()
-            if any_link:
-                logger.warning(f"⚠️ Token found but invalid - is_used: {any_link.is_used}, expires_at: {any_link.expires_at}, now: {now_utc}")
-            else:
-                logger.warning(f"⚠️ Token not found in database")
+            logger.warning(f"⚠️ Token not found in database")
+            return HTMLResponse(
+                content="""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Invalid Link - ReportForge</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #0072CE 0%, #005a9e 100%); color: white; }
+                        .container { background: white; color: #333; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                        h1 { color: #dc3545; }
+                        a { color: #0072CE; text-decoration: none; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1>❌ Link non valido o scaduto</h1>
+                        <p>Questo magic link non è valido o è già stato utilizzato.</p>
+                        <p>I link scadono dopo 15 minuti per sicurezza.</p>
+                        <p><a href="/">← Torna alla pagina di login</a></p>
+                    </div>
+                </body>
+                </html>
+                """,
+                status_code=400
+            )
+        
+        # Check if already used recently (within 10 seconds) - allow re-redirect to handle double-clicks
+        if magic_link.is_used and magic_link.used_at:
+            time_since_use = (now_utc - magic_link.used_at.replace(tzinfo=timezone.utc)).total_seconds()
+            if time_since_use < 10:
+                logger.info(f"⚡ Token recently used ({time_since_use:.1f}s ago), allowing re-redirect to dashboard")
+                # Find existing session and redirect
+                user_session = db.query(UserSession).filter(
+                    and_(
+                        UserSession.user_id == magic_link.user_id,
+                        UserSession.is_active == True,
+                        UserSession.expires_at > now_utc
+                    )
+                ).order_by(UserSession.created_at.desc()).first()
+                
+                if user_session:
+                    redirect_response = RedirectResponse(url="/dashboard", status_code=303)
+                    redirect_response.set_cookie(
+                        key="session_token",
+                        value=user_session.session_token,
+                        max_age=int(os.getenv("SESSION_EXPIRY_DAYS", "30")) * 24 * 60 * 60,
+                        httponly=True,
+                        secure=True,
+                        samesite="lax"
+                    )
+                    return redirect_response
+        
+        # Check if token is valid and not expired
+        if magic_link.is_used or magic_link.expires_at <= now_utc:
+            logger.warning(f"⚠️ Token invalid - is_used: {magic_link.is_used}, expires_at: {magic_link.expires_at}, now: {now_utc}")
             return HTMLResponse(
                 content="""
                 <!DOCTYPE html>
