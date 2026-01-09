@@ -63,7 +63,6 @@ class Project(Base):
     costs = relationship("ProjectCost", back_populates="project", cascade="all, delete-orphan")
     revenue_one_time = relationship("RevenueOneTime", back_populates="project", cascade="all, delete-orphan")
     subscriptions = relationship("Subscription", back_populates="project", cascade="all, delete-orphan")
-    report_projects = relationship("ReportProject", back_populates="project")
 
 
 class Stakeholder(Base):
