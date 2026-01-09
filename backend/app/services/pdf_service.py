@@ -111,14 +111,24 @@ class PDFGenerationService:
         if config.get('show_revenue_details', True):
             subs = db.query(Subscription).all()
             for sub in subs:
+                # Get project for client name
+                project = None
+                client_name = 'Unknown'
+                if sub.project_id:
+                    project = db.query(Project).filter(Project.id == sub.project_id).first()
+                    if project:
+                        client_name = project.name
+                        if hasattr(project, 'clients') and project.clients:
+                            client_name = project.clients[0].name
+                
                 subscriptions.append({
-                    'client_name': sub.name,
-                    'description': sub.description,
+                    'client_name': client_name,
+                    'description': sub.description or '',
                     'start_date': sub.start_date,
                     'end_date': sub.end_date,
-                    'mrr': float(sub.monthly_amount) if sub.monthly_amount else 0,
-                    'arr': float(sub.monthly_amount * 12) if sub.monthly_amount else 0,
-                    'status': sub.status or 'Active'
+                    'mrr': float(sub.annual_value / 12) if sub.annual_value else 0,
+                    'arr': float(sub.annual_value) if sub.annual_value else 0,
+                    'status': 'Active' if not sub.end_date else 'Ended'
                 })
         
         # Get one-time revenue
@@ -127,18 +137,23 @@ class PDFGenerationService:
             revenues = db.query(RevenueOneTime).all()
             for rev in revenues:
                 # Get project for client name
-                project = db.query(Project).filter(Project.id == rev.project_id).first()
+                project = None
                 client_name = 'Unknown'
-                if project and hasattr(project, 'clients') and project.clients:
-                    client_name = project.clients[0].name
+                project_name = 'Unknown'
+                if rev.project_id:
+                    project = db.query(Project).filter(Project.id == rev.project_id).first()
+                    if project:
+                        project_name = project.name
+                        if hasattr(project, 'clients') and project.clients:
+                            client_name = project.clients[0].name
                 
                 revenue_onetime.append({
                     'client_name': client_name,
-                    'project_name': project.name if project else None,
+                    'project_name': project_name,
                     'partner_name': None,
-                    'revenue_date': rev.invoice_date or rev.payment_date,
+                    'revenue_date': rev.date,
                     'amount': float(rev.amount) if rev.amount else 0,
-                    'status': rev.status or 'Pending',
+                    'status': 'Forecast' if rev.is_forecast else 'Actual',
                     'notes': rev.description
                 })
         
