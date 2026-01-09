@@ -1,224 +1,250 @@
-# ReportForge 🔥
+# 📊 ReportForge
 
-**Monthly Report Generator Dashboard for INFOCERT**
+**Monthly report generation system for INFOCERT operations.**
 
-Automated monthly reporting system with progressive data entry and PDF generation.
-
-## 🎯 Features
-
-- **Magic Link Authentication** - Passwordless, email-based login
-- **Project Management** - Track internal, partner, and client projects
-- **Financial Tracking** - Revenue, savings, costs (CAPEX + subscriptions)
-- **Team & Stakeholder Management** - Organize project teams and stakeholders
-- **Complete Versioning** - Full snapshot history before every save
-- **PDF Export** - Professional reports with INFOCERT branding
-- **Multi-user Support** - Multiple users with single-user workflow
-
-## 🏗️ Tech Stack
-
-- **Backend**: FastAPI (Python 3.11)
-- **Database**: PostgreSQL 15
-- **PDF Generation**: WeasyPrint
-- **Frontend**: Tailwind CSS + Alpine.js
-- **Deployment**: Docker Compose + Nginx
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Docker & Docker Compose
-- SMTP credentials for magic link emails
-
-### Local Development
-
-```bash
-# Clone repository
-git clone https://github.com/ilvolodel/reportforge.git
-cd reportforge
-
-# Copy environment file
-cp .env.example .env
-
-# Edit .env with your settings (especially SMTP credentials)
-nano .env
-
-# Start all services
-docker-compose up -d
-
-# Check logs
-docker-compose logs -f
-
-# Access application
-open http://localhost:8080
-```
-
-### Production Deployment (Droplet)
-
-```bash
-# SSH to droplet
-ssh root@10.135.215.172
-
-# Clone repository to /opt/reportforge
-cd /opt
-git clone https://github.com/ilvolodel/reportforge.git
-cd reportforge
-
-# Configure environment
-cp .env.example .env
-nano .env  # Update with production values
-
-# Deploy
-chmod +x deploy.sh
-sudo ./deploy.sh
-
-# Application will be available at:
-# https://reportforge.brainaihub.tech
-```
-
-## 📋 Database Schema
-
-### Master Tables
-- `users` - User authentication
-- `magic_links` - Passwordless auth tokens
-- `projects` - Core project entities
-- `stakeholders` - Customer Care, Sales, Marketing
-- `clients` - NORMA, ASL CUNEO, Casadei
-- `team_members` - J. Cotrina, F. Savarese
-
-### Financial Tables
-- `project_costs` - INTERNAL/VENDOR/INFRASTRUCTURE
-- `revenue_one_time` - CAPEX revenue/saving
-- `subscriptions` - Annual recurring forecast
-- `subscription_transactions` - Monthly actuals
-
-### Report Tables
-- `reports` - Monthly report snapshots
-- `report_projects` - Projects in each report
-- `report_versions` - Full versioning (JSONB)
-
-## 🔧 Configuration
-
-Key environment variables in `.env`:
-
-```bash
-# Database
-POSTGRES_PASSWORD=your_secure_password
-
-# Authentication
-SECRET_KEY=your_secret_key_here
-MAGIC_LINK_EXPIRY_MINUTES=15
-SESSION_EXPIRY_DAYS=30
-
-# Email (SMTP)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=noreply@infocert.it
-SMTP_PASSWORD=your_smtp_password
-SMTP_FROM=ReportForge <noreply@infocert.it>
-
-# Application
-APP_URL=https://reportforge.brainaihub.tech
-```
-
-## 🐳 Docker Services
-
-The application consists of 3 services:
-
-1. **postgres** - PostgreSQL database
-2. **backend** - FastAPI application
-3. **nginx** - Web server & reverse proxy
-
-## 📦 Project Structure
-
-```
-reportforge/
-├── backend/
-│   ├── app/
-│   │   ├── models/          # SQLAlchemy models
-│   │   ├── schemas/         # Pydantic schemas
-│   │   ├── api/             # API endpoints
-│   │   ├── services/        # Business logic
-│   │   ├── templates/       # Jinja2 (PDF, email)
-│   │   └── utils/           # Utilities
-│   ├── alembic/             # Database migrations
-│   └── requirements.txt     # Python dependencies
-├── frontend/
-│   ├── static/              # CSS, JS, assets
-│   └── templates/           # HTML templates
-├── nginx/                   # Nginx configuration
-├── docker-compose.yml       # Docker services
-├── Dockerfile               # Backend container
-└── deploy.sh                # Deployment script
-```
-
-## 🔐 Security
-
-- Passwordless authentication via magic links
-- Session tokens with 30-day expiry
-- HTTPS in production (via nginx proxy)
-- Environment-based secrets
-- PostgreSQL with strong passwords
-
-## 📚 API Documentation
-
-Once running, access:
-- Swagger UI: `http://localhost:8080/api/docs`
-- ReDoc: `http://localhost:8080/api/redoc`
-
-## 🛠️ Useful Commands
-
-```bash
-# View logs
-docker-compose logs -f
-
-# Restart services
-docker-compose restart
-
-# Stop all services
-docker-compose down
-
-# Database shell
-docker-compose exec postgres psql -U reportforge
-
-# Backend shell
-docker-compose exec backend bash
-
-# Run migrations
-docker-compose exec backend alembic upgrade head
-
-# Create new migration
-docker-compose exec backend alembic revision --autogenerate -m "description"
-```
-
-## 📝 Development Roadmap
-
-### Phase 1 (Current)
-- [x] Database schema design
-- [x] Docker infrastructure
-- [ ] Alembic migrations
-- [ ] Magic link authentication
-- [ ] CRUD APIs (projects, team, clients)
-- [ ] Basic frontend UI
-
-### Phase 2
-- [ ] PDF generation with WeasyPrint
-- [ ] PDF import from existing template
-- [ ] Versioning system UI
-- [ ] Executive summary calculations
-
-### Phase 3
-- [ ] Production deployment
-- [ ] End-to-end testing
-- [ ] Performance optimization
-
-## 🤝 Contributing
-
-This is an internal project for INFOCERT. For questions or issues, contact the development team.
-
-## 📄 License
-
-Private - Internal use only
+Transform manual monthly reporting into an automated, efficient workflow with progressive data entry and professional PDF generation.
 
 ---
 
-**Built with ❤️ for INFOCERT**
+## 🎯 Quick Links
+
+| Document | Purpose | When to Use |
+|----------|---------|-------------|
+| **[PROJECT_STATE.md](./PROJECT_STATE.md)** | Complete project documentation & state | Start here! Full context of the project |
+| **[MAINTENANCE_GUIDE.md](./MAINTENANCE_GUIDE.md)** | How to keep docs updated | When updating documentation |
+| **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** | Production deployment procedures | When deploying to production |
+| **[MIGRATION_INSTRUCTIONS.md](./MIGRATION_INSTRUCTIONS.md)** | Database migration guide | When migrating database schema |
+| **[.github/UPDATE_TEMPLATE.md](./.github/UPDATE_TEMPLATE.md)** | Quick update template | When completing a task/sprint |
+
+---
+
+## ✨ Features
+
+- 🔐 **Magic Link Authentication** - Passwordless email-based login
+- 📁 **Project Management** - Complete CRUD with financial tracking (CAPEX/OPEX)
+- 👥 **Team & Stakeholder Management** - Track team members, clients, and stakeholders
+- 💰 **Revenue Tracking** - One-time and subscription-based revenue management
+- 📊 **Report System** - Create reports with editable snapshots and templates
+- 🎨 **InfoCert Branding** - Official Tinexta/InfoCert corporate identity
+- 📄 **PDF Generation** - Automated professional report generation (planned)
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+- **FastAPI** - Modern Python web framework
+- **PostgreSQL** - Relational database with JSONB support
+- **SQLAlchemy** - ORM with full relationship support
+- **Pydantic** - Data validation and serialization
+- **AWS SES** - Email service for magic links
+
+### Frontend
+- **Vanilla JavaScript** - No framework overhead
+- **Tailwind CSS** - Utility-first CSS framework
+- **InfoCert Design System** - Custom branded components
+
+### DevOps
+- **Docker + Docker Compose** - Containerization
+- **Nginx** - Reverse proxy with HTTPS
+- **Let's Encrypt** - SSL/TLS certificates
+
+---
+
+## 🚀 Quick Start
+
+### For Developers (New to Project)
+
+**Start here to understand the full context:**
+
+```bash
+# 1. Read the complete project state
+cat PROJECT_STATE.md
+
+# 2. Clone repository
+git clone https://github.com/ilvolodel/reportforge.git
+cd reportforge
+
+# 3. Read deployment guide for setup
+cat DEPLOYMENT_GUIDE.md
+```
+
+### For Continuing Development
+
+**When you come back to work on the project:**
+
+```bash
+# 1. Check current state (always start here!)
+cat PROJECT_STATE.md | head -100
+
+# 2. Pull latest changes
+git pull
+
+# 3. Check what needs to be done
+# Look at "Current Development Status" and "Next Steps" in PROJECT_STATE.md
+```
+
+### For Documentation Updates
+
+**After completing work:**
+
+```bash
+# 1. Use the update template
+cp .github/UPDATE_TEMPLATE.md /tmp/my_update.md
+# Fill it out
+
+# 2. Update PROJECT_STATE.md based on template
+
+# 3. Read maintenance guide for details
+cat MAINTENANCE_GUIDE.md
+```
+
+---
+
+## 📚 Project Structure
+
+```
+reportforge/
+├── backend/                    # FastAPI backend
+│   ├── app/
+│   │   ├── api/               # API endpoints
+│   │   ├── models/            # SQLAlchemy models
+│   │   ├── schemas/           # Pydantic schemas
+│   │   ├── core/              # Config, security
+│   │   └── utils/             # Utilities
+│   └── requirements.txt
+├── frontend/                   # Static frontend
+│   ├── static/
+│   │   ├── css/
+│   │   ├── js/
+│   │   └── images/
+│   └── templates/             # Jinja2 templates
+├── nginx/                      # Nginx configuration
+├── scripts/                    # Helper scripts
+├── docs/                       # Additional documentation
+├── PROJECT_STATE.md           # 🎯 MAIN DOCUMENTATION
+├── MAINTENANCE_GUIDE.md       # How to maintain docs
+├── DEPLOYMENT_GUIDE.md        # Deployment procedures
+├── docker-compose.yml
+└── README.md                  # This file
+```
+
+---
+
+## 🎓 Documentation System
+
+This project uses a **"Micro-Agent"** documentation system to maintain context across development sessions.
+
+### Key Concept
+
+**PROJECT_STATE.md** serves as a "save point" containing:
+- Complete project overview
+- Infrastructure details (servers, credentials, domains)
+- Database schema (current and planned)
+- API endpoints documentation
+- Development status and task tracking
+- Common operations (deploy, debug, database)
+- Known issues and solutions
+- Next steps and priorities
+
+### When to Update
+
+| Situation | Action | Document |
+|-----------|--------|----------|
+| Completed a task | Update status, mark task done | PROJECT_STATE.md |
+| Changed infrastructure | Update infrastructure section | PROJECT_STATE.md |
+| Added API endpoints | Update API section | PROJECT_STATE.md |
+| Changed DB schema | Update database section | PROJECT_STATE.md |
+| Found/fixed a bug | Update known issues | PROJECT_STATE.md |
+| Changed deployment | Update deployment guide | DEPLOYMENT_GUIDE.md |
+| End of sprint | Full review and update | PROJECT_STATE.md |
+
+**See [MAINTENANCE_GUIDE.md](./MAINTENANCE_GUIDE.md) for detailed instructions.**
+
+---
+
+## 🔐 Access Information
+
+**Production:**
+- **URL:** https://reportforge.brainaihub.tech
+- **Server:** root@10.135.215.172 (password in PROJECT_STATE.md)
+- **Deploy Path:** /opt/reportforge
+
+**Test Users:**
+- daniele.castellari.ext@infocert.it
+- filippo.savarese@infocert.it
+
+**GitHub:** https://github.com/ilvolodel/reportforge
+
+---
+
+## 🎯 Current Status
+
+**Version:** 0.3.0  
+**Phase:** Backend Development - Reports API Complete  
+**Status:** 🟡 Database migration pending
+
+**Progress:** 26/34 tasks complete (76%)
+
+**Next Up:**
+1. Execute database migration (5 min)
+2. Test Reports API end-to-end
+3. Build PDF template with InfoCert branding
+4. Start frontend development
+
+**See PROJECT_STATE.md for complete status.**
+
+---
+
+## 🤝 Contributing
+
+### Workflow
+
+1. **Understand context** - Read PROJECT_STATE.md
+2. **Make changes** - Develop features/fixes
+3. **Update docs** - Use UPDATE_TEMPLATE.md
+4. **Commit** - Use descriptive commit messages
+5. **Deploy** - Follow DEPLOYMENT_GUIDE.md
+6. **Update PROJECT_STATE** - Keep documentation current
+
+### Commit Message Format
+
+```
+<type>: <description>
+
+[optional body]
+
+[optional footer]
+```
+
+**Types:**
+- `feat:` New feature
+- `fix:` Bug fix
+- `docs:` Documentation changes
+- `refactor:` Code refactoring
+- `test:` Adding tests
+- `chore:` Maintenance tasks
+
+---
+
+## 📞 Support
+
+**Primary Contact:** (See PROJECT_STATE.md for user details)  
+**Issues:** https://github.com/ilvolodel/reportforge/issues  
+**Documentation Questions:** See MAINTENANCE_GUIDE.md
+
+---
+
+## 📄 License
+
+Internal project for INFOCERT. Not for public distribution.
+
+---
+
+**Remember:** 
+- 📖 Always start by reading PROJECT_STATE.md
+- 🔄 Keep documentation updated (see MAINTENANCE_GUIDE.md)
+- ✅ Mark tasks as complete when done
+- 📝 Document important decisions and issues
+
+*Last Updated: 2026-01-09*
