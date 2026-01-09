@@ -1,8 +1,8 @@
 # 📊 ReportForge - Project State Documentation
 
 > **Last Updated:** 2026-01-09  
-> **Version:** 0.5.0 (PDF Template System Deployed)  
-> **Status:** 🟢 In Development - PDF Templates Complete, API Integration Next
+> **Version:** 0.5.1 (PDF Generation API Integrated)  
+> **Status:** 🟢 In Development - PDF Generation Working, Frontend CRUD Next
 
 ---
 
@@ -559,18 +559,27 @@ report_templates (
 - ✅ Automated deployment script (deploy_production.py) created
 - ✅ Code deployed to production with Docker rebuild
 - ✅ Updated WeasyPrint to v67.0 and Jinja2 to v3.1.6
-- ⏳ **API integration pending** - Need to connect templates to Reports API endpoints
+
+**PDF Generation API Integration (Task 27a)** ✅
+- ✅ Created PDFGenerationService (backend/app/services/pdf_service.py)
+  - fetch_report_data(): Loads all report data from database
+  - generate_pdf(): Renders HTML with Jinja2 and converts to PDF with WeasyPrint
+  - generate_html_preview(): Returns HTML for debugging
+- ✅ Updated Reports API (backend/app/api/reports.py)
+  - POST /api/reports/{id}/generate-pdf: Generate and download PDF
+  - GET /api/reports/{id}/preview-html: HTML preview endpoint
+- ✅ Fixed database model field access (4 iterations)
+  - Report.template_config instead of template_id
+  - ReportProjectSnapshot individual fields instead of snapshot_data
+  - Subscription.annual_value and description (no name field)
+  - TeamMember.full_name instead of name
+  - Stakeholder simplified fields
+- ✅ Tested in production: Successfully generated 4.1KB PDF + HTML preview
+- ✅ Deployed to production (commit: e3ff90b)
 
 ### ❌ Pending (Tasks 28-34)
 
-27a. **PDF Template API Integration** 🔄 NEXT
-    - Create PDF generation endpoint in Reports API
-    - Connect templates to database models
-    - Implement data fetching and rendering
-    - Test with real report data
-    - Add logo handling and asset management
-
-28. **Frontend: Projects CRUD Page**
+28. **Frontend: Projects CRUD Page** 🔄 NEXT
     - List view with filters and search
     - Create/Edit forms with validation
     - Financial data entry (CAPEX/OPEX)

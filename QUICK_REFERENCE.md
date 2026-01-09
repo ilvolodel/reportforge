@@ -97,6 +97,50 @@ SELECT * FROM users;    # Query users
 
 ---
 
+## 📄 PDF Generation (NEW!)
+
+### Generate PDF from Report
+```bash
+# API Endpoint
+POST /api/reports/{id}/generate-pdf
+
+# Example with curl
+curl -X POST "https://reportforge.brainaihub.tech/api/reports/1/generate-pdf" \
+  -H "Content-Type: application/json" \
+  -d '{"finalize": false}' \
+  -o report.pdf
+
+# HTML Preview (for debugging)
+GET /api/reports/{id}/preview-html
+curl "https://reportforge.brainaihub.tech/api/reports/1/preview-html" -o preview.html
+```
+
+### PDF Templates Location
+```
+backend/app/templates/pdf/
+├── base.html                  # Main template (Jinja2)
+├── styles.css                 # All PDF styles (InfoCert branding)
+├── sections/
+│   ├── cover_page.html
+│   ├── executive_summary.html
+│   ├── projects_overview.html
+│   ├── project_detail.html
+│   ├── team_stakeholders.html
+│   ├── financial_overview.html
+│   ├── revenue_details.html
+│   └── back_cover.html
+```
+
+### PDF Service
+```python
+# Located at: backend/app/services/pdf_service.py
+PDFGenerationService.fetch_report_data(report_id) # Get all data from DB
+PDFGenerationService.generate_pdf(report_id)      # Generate PDF bytes
+PDFGenerationService.generate_html_preview(id)    # HTML for debugging
+```
+
+---
+
 ## 🔍 Troubleshooting
 
 ### Backend not starting?
