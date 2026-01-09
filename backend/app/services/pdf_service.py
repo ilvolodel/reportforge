@@ -59,12 +59,8 @@ class PDFGenerationService:
         
         logger.info(f"Fetching data for report {report_id}: {report.name}")
         
-        # Get report template config
-        config = {}
-        if report.template_id:
-            template = db.query(ReportTemplate).filter(ReportTemplate.id == report.template_id).first()
-            if template and template.config:
-                config = template.config
+        # Get report template config from report itself or use defaults
+        config = report.template_config if report.template_config else {}
         
         # Default config if none provided
         if not config:
@@ -86,46 +82,27 @@ class PDFGenerationService:
         
         projects = []
         for snapshot in snapshots:
-            project_data = snapshot.snapshot_data or {}
+            # Build project data from snapshot fields
+            project_data = {
+                'name': snapshot.name,
+                'status': snapshot.status,
+                'category': snapshot.project_type,
+                'description': snapshot.description,
+                'start_date': snapshot.start_date,
+                'end_date': snapshot.end_date,
+                'financial_data': snapshot.financial_data or {},
+                'team_data': snapshot.team_data or [],
+                'stakeholder_data': snapshot.stakeholder_data or [],
+                'client_data': snapshot.client_data or [],
+                'activities': snapshot.activities_data or [],
+                'deliverables': [],
+                'goals': [],
+                'stakeholders': [s.get('organization', s.get('name', '')) for s in (snapshot.stakeholder_data or [])]
+            }
             
-            # Enrich with related data if available
-            if snapshot.project_id:
-                project = db.query(Project).filter(Project.id == snapshot.project_id).first()
-                if project:
-                    # Get project activities
-                    activities = []
-                    if hasattr(project, 'activities'):
-                        for activity in project.activities:
-                            activities.append({
-                                'date': activity.planned_date or activity.completed_date,
-                                'description': activity.title,
-                                'notes': activity.description or ''
-                            })
-                    
-                    # Get project deliverables (using costs as proxy)
-                    deliverables = []
-                    if hasattr(project, 'costs'):
-                        for cost in project.costs:
-                            deliverables.append({
-                                'name': cost.description or cost.category,
-                                'completed': cost.date is not None,
-                                'due_date': cost.date
-                            })
-                    
-                    # Get project goals
-                    goals = project_data.get('goals', [])
-                    
-                    # Get stakeholders
-                    stakeholders = []
-                    if hasattr(project, 'stakeholders'):
-                        stakeholders = [s.organization for s in project.stakeholders if s.organization]
-                    
-                    project_data.update({
-                        'activities': activities,
-                        'deliverables': deliverables,
-                        'goals': goals,
-                        'stakeholders': stakeholders
-                    })
+            # Get custom fields if available
+            if snapshot.custom_fields:
+                project_data.update(snapshot.custom_fields)
             
             projects.append(project_data)
         
