@@ -379,28 +379,70 @@ def calculate_executive_summary(report_id: int, db: Session = Depends(get_db)):
 
 
 # ============================================================================
-# PDF GENERATION (placeholder)
+# PDF GENERATION
 # ============================================================================
 
 @router.post("/{report_id}/generate-pdf")
-def generate_pdf(report_id: int, request: schemas.GeneratePDFRequest, db: Session = Depends(get_db)):
-    """Generate PDF for report (placeholder)."""
+def generate_pdf_endpoint(report_id: int, request: schemas.GeneratePDFRequest, db: Session = Depends(get_db)):
+    """Generate PDF for report."""
+    from fastapi.responses import FileResponse
+    from ..services.pdf_service import PDFGenerationService
+    import os
+    
     report = db.query(Report).filter(Report.id == report_id).first()
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
     
-    # TODO: Implement PDF generation with WeasyPrint
-    # For now, just update status if requested
-    if request.finalize:
-        report.status = ReportStatus.FINAL
-        report.pdf_generated_at = datetime.utcnow()
-        db.commit()
+    try:
+        # Initialize PDF service
+        pdf_service = PDFGenerationService()
+        
+        # Generate PDF
+        pdf_path = pdf_service.generate_pdf(db, report_id)
+        
+        # Update report status if requested
+        if request.finalize:
+            report.status = ReportStatus.FINAL
+            report.pdf_generated_at = datetime.utcnow()
+            db.commit()
+        
+        # Return PDF file
+        return FileResponse(
+            path=str(pdf_path),
+            media_type="application/pdf",
+            filename=f"report_{report_id}_{datetime.now().strftime('%Y%m%d')}.pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="report_{report_id}.pdf"'
+            }
+        )
     
-    return {
-        "message": "PDF generation not yet implemented",
-        "report_id": report_id,
-        "status": report.status
-    }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"PDF generation failed: {str(e)}"
+        )
+
+
+@router.get("/{report_id}/preview-html")
+def preview_report_html(report_id: int, db: Session = Depends(get_db)):
+    """Get HTML preview of report (useful for debugging templates)."""
+    from fastapi.responses import HTMLResponse
+    from ..services.pdf_service import PDFGenerationService
+    
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    
+    try:
+        pdf_service = PDFGenerationService()
+        html_content = pdf_service.generate_html_preview(db, report_id)
+        return HTMLResponse(content=html_content)
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"HTML preview generation failed: {str(e)}"
+        )
 
 
 # ============================================================================
