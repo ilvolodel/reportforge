@@ -1,8 +1,8 @@
 # 📊 ReportForge - Project State Documentation
 
 > **Last Updated:** 2026-01-09  
-> **Version:** 0.4.0 (Reports API Deployed & Tested)  
-> **Status:** 🟢 In Development - Backend Complete, Frontend Starting
+> **Version:** 0.5.0 (PDF Template System Deployed)  
+> **Status:** 🟢 In Development - PDF Templates Complete, API Integration Next
 
 ---
 
@@ -521,7 +521,7 @@ report_templates (
    - Official Tinexta/InfoCert logos
    - Corporate identity applied
 
-### ✅ Recently Completed (Task 26 & 26a)
+### ✅ Recently Completed (Tasks 26, 26a, 27)
 
 **Reports API Implementation** ✅
 - ✅ Created report models (Report, ReportProjectSnapshot, ReportTemplate, etc.)
@@ -533,25 +533,42 @@ report_templates (
 - ✅ Code committed and pushed to GitHub
 - ✅ **Database migration executed successfully**
 - ✅ **API tested and verified working in production**
-- ❌ PDF generation placeholder (not implemented yet - Task 33)
 
 **Database Migration (Task 26a)** ✅
 - ✅ Created remote_migrate.py script with Paramiko
 - ✅ Executed migration: Dropped old tables
 - ✅ Backend restarted, new schema recreated by SQLAlchemy
 - ✅ Verified 6 new tables created correctly
-- ✅ Tested API endpoints:
-  - Template creation: Working ✅
-  - Report creation with snapshots: Working ✅
-  - Report retrieval: Working ✅
-  - Executive summary: Working ✅
+- ✅ Tested API endpoints working correctly
 
-### ❌ Pending (Tasks 27-34)
+**PDF Template System (Task 27)** ✅
+- ✅ Created WeasyPrint-compatible HTML/CSS template system
+- ✅ Base template (base.html) with Jinja2 conditionals
+- ✅ Comprehensive CSS styles.css with InfoCert branding (colors, typography, layouts)
+- ✅ 8 modular sections created:
+  - cover_page.html - Title, logo, period, metadata
+  - executive_summary.html - KPIs, revenue/saving comparison, benefits, stakeholders
+  - projects_overview.html - Project list table with status badges
+  - project_detail.html - Detailed project info with activities, deliverables
+  - team_stakeholders.html - Team members and stakeholders tables
+  - financial_overview.html - Summary cards, breakdown by client
+  - revenue_details.html - Subscriptions, one-time revenue, savings details
+  - back_cover.html - Contacts and document info
+- ✅ Test script (test_pdf_generation.py) with comprehensive mock data
+- ✅ Local PDF generation tested successfully (49.5 KB output)
+- ✅ Automated deployment script (deploy_production.py) created
+- ✅ Code deployed to production with Docker rebuild
+- ✅ Updated WeasyPrint to v67.0 and Jinja2 to v3.1.6
+- ⏳ **API integration pending** - Need to connect templates to Reports API endpoints
 
-27. **HTML/CSS Modular PDF Template**
-    - Design PDF layout matching InfoCert branding
-    - Create modular sections (configurable)
-    - Implement with WeasyPrint-compatible HTML/CSS
+### ❌ Pending (Tasks 28-34)
+
+27a. **PDF Template API Integration** 🔄 NEXT
+    - Create PDF generation endpoint in Reports API
+    - Connect templates to database models
+    - Implement data fetching and rendering
+    - Test with real report data
+    - Add logo handling and asset management
 
 28. **Frontend: Projects CRUD Page**
     - List view with filters and search

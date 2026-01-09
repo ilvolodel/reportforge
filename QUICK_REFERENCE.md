@@ -42,6 +42,21 @@ filippo.savarese@infocert.it
 
 ## 🚀 Quick Deploy
 
+### Option 1: Automated Deployment (Recommended)
+```bash
+# Deploy with one command (SSH password in script)
+python3 scripts/deploy_production.py
+
+# What it does:
+# - Commits and pushes local changes
+# - SSH to production server
+# - Pulls latest code from GitHub
+# - Rebuilds Docker containers (full rebuild)
+# - Restarts all services
+# - Health check verification
+```
+
+### Option 2: Manual Deployment
 ```bash
 # 1. Commit & push locally
 git add -A && git commit -m "feat: description" && git push
@@ -55,8 +70,9 @@ cd /opt/reportforge
 git pull
 
 # 4. Rebuild (if needed) and restart
-docker compose build backend    # Only if Python code changed
-docker compose up -d backend
+docker compose build --no-cache backend    # Full rebuild
+docker compose down
+docker compose up -d
 
 # 5. Check it worked
 docker logs reportforge-backend --tail 30
@@ -186,6 +202,47 @@ curl https://reportforge.brainaihub.tech/api/reports/templates
 # API docs (in browser)
 open https://reportforge.brainaihub.tech/docs
 ```
+
+---
+
+## 📄 PDF Templates Testing
+
+### Test PDF Generation Locally
+```bash
+# Install dependencies (if needed)
+pip install jinja2 weasyprint
+
+# Generate test PDF with mock data
+python3 scripts/test_pdf_generation.py
+
+# View output
+open test_output/test_report.html    # HTML preview
+open test_output/test_report.pdf     # PDF output
+```
+
+### Template Files Location
+```
+backend/app/templates/pdf/
+├── base.html                    # Master template
+├── styles.css                   # InfoCert-branded styles
+└── sections/
+    ├── cover_page.html
+    ├── executive_summary.html
+    ├── projects_overview.html
+    ├── project_detail.html
+    ├── team_stakeholders.html
+    ├── financial_overview.html
+    ├── revenue_details.html
+    └── back_cover.html
+```
+
+### Key Features
+- ✅ WeasyPrint compatible HTML/CSS
+- ✅ InfoCert branding (colors, fonts, logos)
+- ✅ Modular sections (configurable via config object)
+- ✅ Responsive A4 layout with headers/footers
+- ✅ Status badges, KPI cards, financial formatting
+- ⏳ API integration pending (Task 27a)
 
 ---
 
