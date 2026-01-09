@@ -19,9 +19,11 @@ from .subscription import (
 )
 from .report import (
     Report,
-    ReportProject,
+    ReportProjectSnapshot,
     ReportExecutiveSummary,
-    ReportVersion
+    ReportVersion,
+    ReportTemplate,
+    ReportStatus
 )
 
 __all__ = [
@@ -41,7 +43,9 @@ __all__ = [
     "Subscription",
     "SubscriptionTransaction",
     "Report",
-    "ReportProject",
+    "ReportProjectSnapshot",
     "ReportExecutiveSummary",
     "ReportVersion",
+    "ReportTemplate",
+    "ReportStatus",
 ]
