@@ -59,3 +59,4 @@ alembic/versions/__pycache__/
 # Temporary files
 tmp/
 temp/
+test_output/

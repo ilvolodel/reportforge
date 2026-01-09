@@ -1,0 +1,428 @@
+/* ReportForge - PDF Styles with InfoCert Branding */
+
+/* ==================== RESET & BASE ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@page {
+    size: A4;
+    margin: 2cm 1.5cm;
+    
+    @top-right {
+        content: "ReportForge | INFOCERT";
+        font-size: 9pt;
+        color: #666;
+    }
+    
+    @bottom-center {
+        content: "Pagina " counter(page) " di " counter(pages);
+        font-size: 9pt;
+        color: #666;
+    }
+}
+
+/* ==================== TYPOGRAPHY ==================== */
+body {
+    font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #333;
+    background: white;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 0.5em;
+}
+
+h1 {
+    font-size: 24pt;
+    color: #0072CE;
+    margin-bottom: 0.3em;
+}
+
+h2 {
+    font-size: 18pt;
+    color: #005a9e;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    page-break-after: avoid;
+}
+
+h3 {
+    font-size: 14pt;
+    color: #0072CE;
+    margin-top: 0.8em;
+    margin-bottom: 0.4em;
+}
+
+h4 {
+    font-size: 12pt;
+    color: #333;
+    margin-top: 0.6em;
+    margin-bottom: 0.3em;
+}
+
+p {
+    margin-bottom: 0.8em;
+}
+
+/* ==================== INFOCERT BRANDING ==================== */
+:root {
+    --primary-blue: #0072CE;
+    --dark-blue: #005a9e;
+    --light-blue: #e6f3fb;
+    --accent-orange: #FF8C00;
+    --text-dark: #333;
+    --text-light: #666;
+    --border-color: #ddd;
+    --success-green: #28a745;
+    --warning-orange: #fd7e14;
+    --danger-red: #dc3545;
+}
+
+.primary-color { color: var(--primary-blue); }
+.dark-color { color: var(--dark-blue); }
+.light-bg { background-color: var(--light-blue); }
+.success { color: var(--success-green); }
+.warning { color: var(--warning-orange); }
+.danger { color: var(--danger-red); }
+
+/* ==================== HEADER & FOOTER ==================== */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1cm 0 0.5cm 0;
+    border-bottom: 3px solid var(--primary-blue);
+    margin-bottom: 1cm;
+}
+
+.header-logo {
+    height: 40px;
+}
+
+.header-title {
+    font-size: 20pt;
+    font-weight: 600;
+    color: var(--primary-blue);
+}
+
+.footer {
+    margin-top: 2cm;
+    padding-top: 0.5cm;
+    border-top: 1px solid var(--border-color);
+    font-size: 9pt;
+    color: var(--text-light);
+    text-align: center;
+}
+
+/* ==================== COVER PAGE ==================== */
+.cover-page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    page-break-after: always;
+}
+
+.cover-title {
+    font-size: 32pt;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.5cm;
+}
+
+.cover-subtitle {
+    font-size: 18pt;
+    color: var(--text-dark);
+    margin-bottom: 0.3cm;
+}
+
+.cover-period {
+    font-size: 14pt;
+    color: var(--text-light);
+    margin-bottom: 1cm;
+}
+
+.cover-logo {
+    width: 200px;
+    margin-top: 2cm;
+}
+
+/* ==================== EXECUTIVE SUMMARY ==================== */
+.executive-summary {
+    background: linear-gradient(135deg, var(--light-blue) 0%, white 100%);
+    padding: 1cm;
+    border-left: 5px solid var(--primary-blue);
+    margin-bottom: 1cm;
+    page-break-inside: avoid;
+}
+
+.executive-summary h2 {
+    margin-top: 0;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5cm;
+    margin: 1cm 0;
+}
+
+.kpi-card {
+    background: white;
+    padding: 0.5cm;
+    border-radius: 8px;
+    border: 2px solid var(--primary-blue);
+    text-align: center;
+}
+
+.kpi-label {
+    font-size: 9pt;
+    color: var(--text-light);
+    text-transform: uppercase;
+    margin-bottom: 0.2cm;
+}
+
+.kpi-value {
+    font-size: 20pt;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.kpi-value.positive {
+    color: var(--success-green);
+}
+
+.kpi-value.negative {
+    color: var(--danger-red);
+}
+
+/* ==================== TABLES ==================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5cm 0 1cm 0;
+    font-size: 10pt;
+    page-break-inside: avoid;
+}
+
+thead {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+thead th {
+    padding: 0.3cm;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid var(--dark-blue);
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--border-color);
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+    background-color: var(--light-blue);
+}
+
+tbody td {
+    padding: 0.25cm;
+    border: 1px solid var(--border-color);
+}
+
+.table-header-secondary {
+    background-color: var(--dark-blue);
+    color: white;
+    font-weight: 600;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.amount {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.amount.revenue {
+    color: var(--success-green);
+}
+
+.amount.cost {
+    color: var(--danger-red);
+}
+
+/* ==================== PROJECT SECTIONS ==================== */
+.project-section {
+    margin: 1cm 0;
+    page-break-inside: avoid;
+}
+
+.project-header {
+    background: var(--primary-blue);
+    color: white;
+    padding: 0.3cm 0.5cm;
+    border-radius: 5px 5px 0 0;
+}
+
+.project-body {
+    border: 2px solid var(--primary-blue);
+    border-top: none;
+    padding: 0.5cm;
+    border-radius: 0 0 5px 5px;
+}
+
+.project-meta {
+    display: flex;
+    gap: 1cm;
+    margin-bottom: 0.5cm;
+    font-size: 9pt;
+    color: var(--text-light);
+}
+
+.project-meta-item {
+    display: flex;
+    align-items: center;
+}
+
+.project-meta-label {
+    font-weight: 600;
+    margin-right: 0.2cm;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.1cm 0.3cm;
+    border-radius: 3px;
+    font-size: 8pt;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-active { background: #28a74520; color: #28a745; }
+.status-completed { background: #17a2b820; color: #17a2b8; }
+.status-planning { background: #ffc10720; color: #ffc107; }
+.status-on-hold { background: #fd7e1420; color: #fd7e14; }
+.status-cancelled { background: #dc354520; color: #dc3545; }
+
+/* ==================== FINANCIAL OVERVIEW ==================== */
+.financial-overview {
+    margin: 1cm 0;
+}
+
+.financial-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5cm;
+    margin: 0.5cm 0;
+}
+
+.financial-card {
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5cm;
+}
+
+.financial-card-header {
+    font-weight: 600;
+    color: var(--dark-blue);
+    margin-bottom: 0.3cm;
+    padding-bottom: 0.2cm;
+    border-bottom: 2px solid var(--light-blue);
+}
+
+.financial-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.15cm 0;
+    font-size: 10pt;
+}
+
+.financial-row-label {
+    color: var(--text-light);
+}
+
+.financial-row-value {
+    font-weight: 600;
+}
+
+.financial-total {
+    margin-top: 0.3cm;
+    padding-top: 0.3cm;
+    border-top: 2px solid var(--primary-blue);
+    font-size: 12pt;
+    font-weight: 700;
+}
+
+/* ==================== LISTS ==================== */
+ul, ol {
+    margin-left: 0.8cm;
+    margin-bottom: 0.8em;
+}
+
+li {
+    margin-bottom: 0.3em;
+}
+
+ul.no-bullets {
+    list-style: none;
+    margin-left: 0;
+}
+
+/* ==================== UTILITIES ==================== */
+.mb-1 { margin-bottom: 0.5cm; }
+.mb-2 { margin-bottom: 1cm; }
+.mb-3 { margin-bottom: 1.5cm; }
+
+.mt-1 { margin-top: 0.5cm; }
+.mt-2 { margin-top: 1cm; }
+.mt-3 { margin-top: 1.5cm; }
+
+.page-break {
+    page-break-after: always;
+}
+
+.no-page-break {
+    page-break-inside: avoid;
+}
+
+.text-bold { font-weight: 700; }
+.text-muted { color: var(--text-light); }
+.text-small { font-size: 9pt; }
+
+/* ==================== PRINT SPECIFIC ==================== */
+@media print {
+    .no-print {
+        display: none;
+    }
+    
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    /* Ensure colors are printed */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}

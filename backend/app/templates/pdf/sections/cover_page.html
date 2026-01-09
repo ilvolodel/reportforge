@@ -1,0 +1,30 @@
+<!-- COVER PAGE -->
+<div class="cover-page">
+    <div>
+        <!-- Logo InfoCert/Tinexta -->
+        {% if logo_path %}
+        <img src="{{ logo_path }}" alt="InfoCert Logo" class="cover-logo">
+        {% endif %}
+        
+        <h1 class="cover-title">{{ report.name }}</h1>
+        
+        <p class="cover-subtitle">
+            Report Mensile - {{ report.period_start.strftime('%B %Y')|capitalize }}
+        </p>
+        
+        <p class="cover-period">
+            Periodo: {{ report.period_start.strftime('%d/%m/%Y') }} - {{ report.period_end.strftime('%d/%m/%Y') }}
+        </p>
+        
+        {% if report.description %}
+        <p class="text-muted" style="max-width: 70%; margin: 1cm auto;">
+            {{ report.description }}
+        </p>
+        {% endif %}
+        
+        <div class="mt-3 text-small text-muted">
+            <p>Generato il: {{ generation_date.strftime('%d/%m/%Y alle %H:%M') }}</p>
+            <p>Versione: {{ report.id }}</p>
+        </div>
+    </div>
+</div>

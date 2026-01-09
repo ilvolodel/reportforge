@@ -1,0 +1,188 @@
+<!-- REVENUE & SAVING DETAILS -->
+<div class="page-break"></div>
+
+<h2>Dettaglio Revenue & Saving</h2>
+
+<!-- Subscriptions -->
+{% if subscriptions %}
+<div class="mb-2">
+    <h3>Subscriptions (Recurring)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Descrizione</th>
+                <th class="text-center">Data Inizio</th>
+                <th class="text-center">Data Fine</th>
+                <th class="text-right">MRR</th>
+                <th class="text-right">ARR</th>
+                <th class="text-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sub in subscriptions %}
+            <tr>
+                <td><strong>{{ sub.client_name }}</strong></td>
+                <td class="text-small">{{ sub.description or '-' }}</td>
+                <td class="text-center text-small">
+                    {% if sub.start_date %}
+                    {{ sub.start_date.strftime('%m/%Y') }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td class="text-center text-small">
+                    {% if sub.end_date %}
+                    {{ sub.end_date.strftime('%m/%Y') }}
+                    {% else %}
+                    <span class="text-muted">Ongoing</span>
+                    {% endif %}
+                </td>
+                <td class="text-right amount revenue">
+                    {{ "€{:,.0f}".format(sub.mrr or 0).replace(',', '.') }}
+                </td>
+                <td class="text-right amount revenue">
+                    <strong>{{ "€{:,.0f}".format(sub.arr or 0).replace(',', '.') }}</strong>
+                </td>
+                <td class="text-center">
+                    <span class="status-badge status-active">{{ sub.status or 'Active' }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr class="table-header-secondary">
+                <td colspan="4"><strong>TOTALE SUBSCRIPTIONS</strong></td>
+                <td class="text-right amount revenue">
+                    <strong>{{ "€{:,.0f}".format(subscriptions|sum(attribute='mrr')|default(0)).replace(',', '.') }}</strong>
+                </td>
+                <td class="text-right amount revenue">
+                    <strong>{{ "€{:,.0f}".format(subscriptions|sum(attribute='arr')|default(0)).replace(',', '.') }}</strong>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- One-Time Revenue -->
+{% if revenue_onetime %}
+<div class="mb-2">
+    <h3>Revenue One-Time</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Progetto</th>
+                <th>Partner</th>
+                <th class="text-center">Data</th>
+                <th class="text-right">Revenue</th>
+                <th class="text-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rev in revenue_onetime %}
+            <tr>
+                <td><strong>{{ rev.client_name }}</strong></td>
+                <td>{{ rev.project_name or '-' }}</td>
+                <td class="text-small">{{ rev.partner_name or '-' }}</td>
+                <td class="text-center text-small">
+                    {% if rev.revenue_date %}
+                    {{ rev.revenue_date.strftime('%m/%Y') }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td class="text-right amount revenue">
+                    {{ "€{:,.0f}".format(rev.amount or 0).replace(',', '.') }}
+                </td>
+                <td class="text-center">
+                    {% if rev.status %}
+                    <span class="status-badge status-active">{{ rev.status }}</span>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+            </tr>
+            {% if rev.notes %}
+            <tr>
+                <td colspan="6" class="text-small text-muted" style="padding-left: 1cm;">
+                    <em>Note: {{ rev.notes }}</em>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            <tr class="table-header-secondary">
+                <td colspan="4"><strong>TOTALE ONE-TIME</strong></td>
+                <td class="text-right amount revenue">
+                    <strong>{{ "€{:,.0f}".format(revenue_onetime|sum(attribute='amount')|default(0)).replace(',', '.') }}</strong>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Saving Details -->
+{% if savings %}
+<div class="mb-2">
+    <h3>Saving & Cost Reduction</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Descrizione</th>
+                <th>Tipo</th>
+                <th class="text-center">Data</th>
+                <th class="text-right">Saving</th>
+                <th class="text-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sav in savings %}
+            <tr>
+                <td><strong>{{ sav.client_name }}</strong></td>
+                <td class="text-small">{{ sav.description or '-' }}</td>
+                <td class="text-small">{{ sav.saving_type or '-' }}</td>
+                <td class="text-center text-small">
+                    {% if sav.saving_date %}
+                    {{ sav.saving_date.strftime('%m/%Y') }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td class="text-right amount">
+                    {{ "€{:,.0f}".format(sav.amount or 0).replace(',', '.') }}
+                </td>
+                <td class="text-center">
+                    {% if sav.status %}
+                    <span class="status-badge status-active">{{ sav.status }}</span>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+            </tr>
+            {% if sav.notes %}
+            <tr>
+                <td colspan="6" class="text-small text-muted" style="padding-left: 1cm;">
+                    <em>Note: {{ sav.notes }}</em>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            <tr class="table-header-secondary">
+                <td colspan="4"><strong>TOTALE SAVING</strong></td>
+                <td class="text-right amount">
+                    <strong>{{ "€{:,.0f}".format(savings|sum(attribute='amount')|default(0)).replace(',', '.') }}</strong>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- If no financial data -->
+{% if not subscriptions and not revenue_onetime and not savings %}
+<p class="text-muted">Nessun dato finanziario disponibile per questo report.</p>
+{% endif %}

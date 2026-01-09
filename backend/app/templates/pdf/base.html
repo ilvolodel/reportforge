@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report.name }} - ReportForge</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Inline styles for WeasyPrint compatibility */
+        {% include 'pdf/styles.css' %}
+    </style>
+</head>
+<body>
+    <!-- COVER PAGE -->
+    {% if config.show_cover %}
+    {% include 'pdf/sections/cover_page.html' %}
+    {% endif %}
+
+    <!-- EXECUTIVE SUMMARY -->
+    {% if config.show_executive_summary %}
+    {% include 'pdf/sections/executive_summary.html' %}
+    {% endif %}
+
+    <!-- PROJECTS OVERVIEW -->
+    {% if config.show_projects and projects %}
+    {% include 'pdf/sections/projects_overview.html' %}
+    {% endif %}
+
+    <!-- DETAILED PROJECTS -->
+    {% if config.show_project_details and projects %}
+    {% for project in projects %}
+    {% include 'pdf/sections/project_detail.html' %}
+    {% endfor %}
+    {% endif %}
+
+    <!-- TEAM & STAKEHOLDERS -->
+    {% if config.show_team_stakeholders %}
+    {% include 'pdf/sections/team_stakeholders.html' %}
+    {% endif %}
+
+    <!-- FINANCIAL OVERVIEW -->
+    {% if config.show_financial_overview %}
+    {% include 'pdf/sections/financial_overview.html' %}
+    {% endif %}
+
+    <!-- REVENUE & SAVING DETAILS -->
+    {% if config.show_revenue_details %}
+    {% include 'pdf/sections/revenue_details.html' %}
+    {% endif %}
+
+    <!-- BACK COVER -->
+    {% if config.show_back_cover %}
+    {% include 'pdf/sections/back_cover.html' %}
+    {% endif %}
+</body>
+</html>

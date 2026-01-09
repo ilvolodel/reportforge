@@ -1,0 +1,30 @@
+<!-- BACK COVER -->
+<div class="page-break"></div>
+
+<div class="cover-page">
+    <div>
+        <h2 class="primary-color">Fine Report</h2>
+        
+        <p class="text-muted mb-2">
+            Report generato automaticamente da ReportForge
+        </p>
+        
+        {% if logo_path %}
+        <img src="{{ logo_path }}" alt="InfoCert Logo" class="cover-logo">
+        {% endif %}
+        
+        <div class="mt-3 text-small text-muted">
+            <p><strong>Contatti</strong></p>
+            <p>INFOCERT S.p.A.</p>
+            <p>AI Customer Support Team</p>
+            {% if report.author_email %}
+            <p>Email: {{ report.author_email }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="mt-2 text-small text-muted">
+            <p>Documento generato il {{ generation_date.strftime('%d/%m/%Y alle %H:%M') }}</p>
+            <p>ReportForge v{{ version or '1.0.0' }}</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+<!-- TEAM & STAKEHOLDERS -->
+<div class="page-break"></div>
+
+<h2>Team & Stakeholder</h2>
+
+<!-- Team Members -->
+{% if team_members %}
+<div class="mb-2">
+    <h3>Team Operativo</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Ruolo</th>
+                <th>Email</th>
+                <th class="text-center">Progetti Coinvolti</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in team_members %}
+            <tr>
+                <td><strong>{{ member.name }}</strong></td>
+                <td>{{ member.role or '-' }}</td>
+                <td class="text-small">{{ member.email or '-' }}</td>
+                <td class="text-center">
+                    {% if member.project_count %}
+                    {{ member.project_count }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Stakeholders -->
+{% if stakeholders %}
+<div class="mb-2">
+    <h3>Stakeholder</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Organizzazione</th>
+                <th>Ruolo</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stakeholder in stakeholders %}
+            <tr>
+                <td><strong>{{ stakeholder.name }}</strong></td>
+                <td>{{ stakeholder.organization or '-' }}</td>
+                <td>{{ stakeholder.role or '-' }}</td>
+                <td class="text-small">{{ stakeholder.email or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- If neither team nor stakeholders exist -->
+{% if not team_members and not stakeholders %}
+<p class="text-muted">Nessuna informazione disponibile su team e stakeholder per questo report.</p>
+{% endif %}

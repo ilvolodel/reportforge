@@ -1,0 +1,116 @@
+<!-- FINANCIAL OVERVIEW -->
+<div class="page-break"></div>
+
+<h2>Panoramica Finanziaria</h2>
+
+<div class="financial-overview">
+    <!-- Summary Cards -->
+    <div class="financial-grid">
+        <!-- Revenue Card -->
+        <div class="financial-card">
+            <div class="financial-card-header">Revenue Totale</div>
+            <div class="financial-row">
+                <span class="financial-row-label">Subscriptions</span>
+                <span class="financial-row-value amount revenue">
+                    {{ "€{:,.0f}".format(financial.subscriptions_revenue or 0).replace(',', '.') }}
+                </span>
+            </div>
+            <div class="financial-row">
+                <span class="financial-row-label">One-Time</span>
+                <span class="financial-row-value amount revenue">
+                    {{ "€{:,.0f}".format(financial.onetime_revenue or 0).replace(',', '.') }}
+                </span>
+            </div>
+            <div class="financial-total">
+                <div class="financial-row">
+                    <span>Totale Revenue</span>
+                    <span class="amount revenue">
+                        {{ "€{:,.0f}".format(financial.total_revenue or 0).replace(',', '.') }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Saving Card -->
+        <div class="financial-card">
+            <div class="financial-card-header">Saving Totale</div>
+            <div class="financial-row">
+                <span class="financial-row-label">Operational</span>
+                <span class="financial-row-value amount">
+                    {{ "€{:,.0f}".format(financial.operational_saving or 0).replace(',', '.') }}
+                </span>
+            </div>
+            <div class="financial-row">
+                <span class="financial-row-label">Process Improvement</span>
+                <span class="financial-row-value amount">
+                    {{ "€{:,.0f}".format(financial.process_saving or 0).replace(',', '.') }}
+                </span>
+            </div>
+            <div class="financial-total">
+                <div class="financial-row">
+                    <span>Totale Saving</span>
+                    <span class="amount {% if financial.total_saving > 0 %}revenue{% endif %}">
+                        {{ "€{:,.0f}".format(financial.total_saving or 0).replace(',', '.') }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Grand Total -->
+    <div class="mb-2 mt-2" style="background: var(--light-blue); padding: 0.5cm; border-radius: 8px; border: 2px solid var(--primary-blue);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0;">Valore Totale Generato</h3>
+            <div style="font-size: 24pt; font-weight: 700; color: var(--primary-blue);">
+                {{ "€{:,.0f}".format((financial.total_revenue or 0) + (financial.total_saving or 0)).replace(',', '.') }}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Breakdown by Client/Project (if available) -->
+    {% if financial.breakdown %}
+    <div class="mb-2">
+        <h3>Dettaglio per Cliente</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Progetto</th>
+                    <th class="text-right">Revenue</th>
+                    <th class="text-right">Saving</th>
+                    <th class="text-right">Totale</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in financial.breakdown %}
+                <tr>
+                    <td><strong>{{ item.client_name }}</strong></td>
+                    <td>{{ item.project_name or '-' }}</td>
+                    <td class="text-right amount revenue">
+                        {{ "€{:,.0f}".format(item.revenue or 0).replace(',', '.') }}
+                    </td>
+                    <td class="text-right amount">
+                        {{ "€{:,.0f}".format(item.saving or 0).replace(',', '.') }}
+                    </td>
+                    <td class="text-right amount">
+                        <strong>{{ "€{:,.0f}".format((item.revenue or 0) + (item.saving or 0)).replace(',', '.') }}</strong>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr class="table-header-secondary">
+                    <td colspan="2"><strong>TOTALE</strong></td>
+                    <td class="text-right amount revenue">
+                        <strong>{{ "€{:,.0f}".format(financial.total_revenue or 0).replace(',', '.') }}</strong>
+                    </td>
+                    <td class="text-right amount">
+                        <strong>{{ "€{:,.0f}".format(financial.total_saving or 0).replace(',', '.') }}</strong>
+                    </td>
+                    <td class="text-right amount">
+                        <strong>{{ "€{:,.0f}".format((financial.total_revenue or 0) + (financial.total_saving or 0)).replace(',', '.') }}</strong>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
