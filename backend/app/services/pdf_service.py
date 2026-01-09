@@ -172,9 +172,9 @@ class PDFGenerationService:
                     project_count = len(member.projects)
                 
                 team_members.append({
-                    'name': member.name,
-                    'role': member.role,
-                    'email': member.email,
+                    'name': member.full_name,
+                    'role': member.role or '',
+                    'email': member.email or '',
                     'project_count': project_count
                 })
         
@@ -185,14 +185,27 @@ class PDFGenerationService:
             for sh in stakeholders_db[:10]:  # Limit to top 10
                 stakeholders_list.append({
                     'name': sh.name,
-                    'organization': sh.organization,
-                    'role': sh.role,
-                    'email': sh.email
+                    'organization': sh.name,  # Stakeholder name is the organization
+                    'role': '',
+                    'email': ''
                 })
         
         # Executive summary from report metadata or calculate
-        executive_summary = report.executive_summary or {}
-        if not executive_summary:
+        exec_summary_obj = report.executive_summary
+        if exec_summary_obj and hasattr(exec_summary_obj, 'actual_revenue_total'):
+            executive_summary = {
+                'overview_text': exec_summary_obj.notes or report.description or '',
+                'year_current': report.period_start.year if report.period_start else datetime.now().year,
+                'year_forecast': (report.period_start.year + 1) if report.period_start else datetime.now().year + 1,
+                'revenue_current': float(exec_summary_obj.actual_revenue_total or 0),
+                'saving_current': float(exec_summary_obj.actual_saving_total or 0),
+                'total_current': float(exec_summary_obj.actual_revenue_total or 0) + float(exec_summary_obj.actual_saving_total or 0),
+                'show_forecast': True,
+                'revenue_forecast': float(exec_summary_obj.forecast_revenue_total or 0),
+                'saving_forecast': float(exec_summary_obj.forecast_saving_total or 0),
+                'total_forecast': float(exec_summary_obj.forecast_revenue_total or 0) + float(exec_summary_obj.forecast_saving_total or 0)
+            }
+        else:
             executive_summary = {
                 'overview_text': report.description or '',
                 'year_current': report.period_start.year if report.period_start else datetime.now().year,
