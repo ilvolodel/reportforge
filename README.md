@@ -11,6 +11,7 @@ Transform manual monthly reporting into an automated, efficient workflow with pr
 | Document | Purpose | When to Use |
 |----------|---------|-------------|
 | **[PROJECT_STATE.md](./PROJECT_STATE.md)** | Complete project documentation & state | Start here! Full context of the project |
+| **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** | ⚡ Fast access to credentials, deploy, troubleshooting | Need info FAST! |
 | **[MAINTENANCE_GUIDE.md](./MAINTENANCE_GUIDE.md)** | How to keep docs updated | When updating documentation |
 | **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** | Production deployment procedures | When deploying to production |
 | **[MIGRATION_INSTRUCTIONS.md](./MIGRATION_INSTRUCTIONS.md)** | Database migration guide | When migrating database schema |
