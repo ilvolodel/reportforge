@@ -87,7 +87,7 @@ git push
 # - Completed tasks list
 # - Next Steps priorities
 
-# 2. Cleanup eventuali guide obsolete
+# 2. Cleanup parti obsolete (vedi regola sotto)
 
 # 3. Commit delle modifiche
 git add PROJECT_STATE.md
@@ -173,6 +173,153 @@ Copia questo quando fai un update di PROJECT_STATE.md:
 | **Common Operations** | Nuove procedure o cambi a esistenti | Quando cambiano |
 | **Known Issues** | Nuovi problemi o risoluzioni | Quando si verificano |
 | **Next Steps** | Cambio priorità o nuovi task scoperti | Settimanale |
+
+---
+
+## 🗑️ REGOLA: Eliminazione Parti Obsolete dalla Documentazione
+
+### **Principio Fondamentale**
+La documentazione deve essere **snella, attuale e non ridondante**. Elimina dettagli obsoleti per mantenere il documento leggibile.
+
+### **Sezione "Recently Completed" - Rolling Window**
+
+**QUANDO consolidare:**
+- Ogni 3-4 task completati
+- Quando "Recently Completed" supera 60 righe
+- Quando inizi una nuova fase (es. Backend → Frontend)
+
+**COME fare:**
+
+1. **Sposta i task vecchi in formato condensato alla sezione "Completed"**
+   ```markdown
+   PRIMA (Recently Completed):
+   **Task 27 - PDF Template System** ✅
+   - Created WeasyPrint-compatible HTML/CSS template system
+   - Base template (base.html) with Jinja2 conditionals
+   - Comprehensive CSS styles.css with InfoCert branding
+   - 8 modular sections created:
+     - cover_page.html
+     - executive_summary.html
+     ...
+   (50+ righe di dettagli)
+   
+   DOPO (Completed):
+   27. ✅ PDF Template System - WeasyPrint HTML/CSS with 8 modular sections + InfoCert branding
+   ```
+
+2. **Mantieni in "Recently Completed" solo gli ultimi 2-3 task più rilevanti**
+   - Questi sono quelli su cui potresti dover tornare a breve
+   - Mantieni 2-3 livelli di dettaglio (bullet points con sub-items)
+
+3. **Elimina sezioni "NEXT" quando non sono più next**
+   ```markdown
+   # ELIMINA righe come:
+   27a. **PDF Template API Integration** 🔄 NEXT  # <-- Se l'hai completato, va in Completed, non in Pending!
+   ```
+
+4. **Rimuovi duplicazioni**
+   - Se un task è in "Recently Completed", NON deve essere anche in "Pending"
+   - Se hai "Task 27a" completato, rimuovi ogni riferimento ad esso in "Pending" o "Next Steps"
+
+### **Sezione "Pending"**
+
+**ELIMINA:**
+- ❌ Task che sono stati completati (ovvio!)
+- ❌ Task che sono stati divisi in subtask (tieni solo i subtask)
+- ❌ Task che non sono più rilevanti/prioritari
+- ❌ Descrizioni dettagliate (in Pending bastano 2-3 bullet per task)
+
+**MANTIENI:**
+- ✅ Solo task realmente da fare
+- ✅ Formato conciso (titolo + 2-4 bullet points max)
+- ✅ Indicatore 🔄 NEXT solo sul task IMMEDIATAMENTE prossimo
+
+### **Sezione "Known Issues"**
+
+**ELIMINA:**
+- ❌ Issue risolti DOPO 1-2 sprint (sposta in "Resolved" poi elimina dopo un po')
+- ❌ Issue non più rilevanti (es. bug in codice che è stato completamente riscritto)
+
+**MANTIENI:**
+- ✅ Issue attuali e non risolti
+- ✅ Workaround temporanei da ricordare
+
+### **Sezione "Next Steps"**
+
+**ELIMINA:**
+- ❌ Step già completati
+- ❌ Step che non sono più prioritari (ripianifica o elimina)
+
+**AGGIORNA:**
+- ✅ Ogni volta che completi un task, aggiorna "Next Steps" con nuovo ordine
+
+### **Esempio Pratico di Cleanup**
+
+```markdown
+### PRIMA DEL CLEANUP (troppo verbose):
+
+### ✅ Recently Completed (Tasks 20-27a)
+**Task 20** ✅
+- 30 righe di dettagli...
+
+**Task 21** ✅
+- 25 righe di dettagli...
+
+**Task 22** ✅
+- 20 righe di dettagli...
+
+...
+**Task 27a** ✅
+- 20 righe di dettagli...
+
+### ❌ Pending
+27a. PDF API Integration 🔄 NEXT  # <-- DUPLICATO!
+28. Frontend CRUD
+
+### DOPO IL CLEANUP (snello):
+
+### ✅ Completed (Tasks 1-27)
+[... condensato ...]
+20. ✅ Task 20 - Description (1 riga)
+21. ✅ Task 21 - Description (1 riga)
+22. ✅ Task 22 - Description (1 riga)
+23. ✅ Task 23 - Description (1 riga)
+24. ✅ Task 24 - Description (1 riga)
+25. ✅ Task 25 - Description (1 riga)
+26. ✅ Reports API Implementation with snapshot system
+27. ✅ PDF Template System - WeasyPrint HTML/CSS with 8 modular sections
+
+### ✅ Recently Completed (Task 27a)
+**PDF Generation API Integration** ✅
+- Created PDFGenerationService (pdf_service.py)
+- Added POST /api/reports/{id}/generate-pdf endpoint
+- Fixed database model field access (4 iterations)
+- Tested in production: 4.1KB PDF generated successfully
+
+### ❌ Pending (Tasks 28-32)
+28. **Frontend: Projects CRUD Page** 🔄 NEXT
+    - List view with filters
+    - Create/Edit forms
+    - Financial data entry
+
+29. **Frontend: Other CRUD Pages**
+    - Clients, Team, Stakeholders
+    - Subscriptions & Revenue
+
+[...]
+```
+
+### **Checklist Cleanup (da fare ogni 3-4 task):**
+
+```markdown
+□ "Recently Completed" ha max 2-3 task con dettagli?
+□ Task più vecchi sono stati condensati in "Completed" (1 riga ciascuno)?
+□ Nessuna duplicazione tra "Completed" e "Pending"?
+□ Indicatore 🔄 NEXT è solo su UN task?
+□ "Known Issues" sono attuali?
+□ "Next Steps" sono aggiornati e prioritizzati?
+□ Nessuna sezione obsoleta (es. "TODO Old", "Archive", etc.)?
+```
 
 ---
 
