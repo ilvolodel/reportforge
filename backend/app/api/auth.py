@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 public_router = APIRouter(tags=["Authentication - Public"])
 
 
-# HTML template for invalid link with auto-redirect to dashboard if already logged in
+# HTML template for invalid link - redirects to login page
 INVALID_LINK_HTML = """
 <!DOCTYPE html>
 <html>
@@ -29,8 +29,9 @@ INVALID_LINK_HTML = """
         body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #0072CE 0%, #005a9e 100%); color: white; }
         .container { background: white; color: #333; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         h1 { color: #dc3545; }
-        a { color: #0072CE; text-decoration: none; font-weight: bold; }
-        .checking { color: #0072CE; font-size: 14px; margin-top: 20px; }
+        p { margin: 15px 0; line-height: 1.6; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #dc3545; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -38,10 +39,15 @@ INVALID_LINK_HTML = """
         <h1>❌ Link non valido o scaduto</h1>
         <p>Questo magic link non è valido o è già stato utilizzato.</p>
         <p>I link scadono dopo 15 minuti per sicurezza.</p>
-        <p style="margin-top: 30px;"><strong>Hai già effettuato l'accesso?</strong></p>
-        <p><a href="/dashboard" style="display: inline-block; padding: 12px 24px; background: #0072CE; color: white; border-radius: 5px; margin: 10px;">Vai alla Dashboard</a></p>
-        <p style="margin-top: 20px;"><a href="/">← Richiedi un nuovo magic link</a></p>
+        <div class="spinner"></div>
+        <p style="font-size: 14px; color: #666;">Reindirizzamento alla pagina di login...</p>
     </div>
+    <script>
+        // Redirect to login page after showing error
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 2500);
+    </script>
 </body>
 </html>
 """
