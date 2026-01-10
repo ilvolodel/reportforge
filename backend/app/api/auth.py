@@ -68,8 +68,10 @@ SUCCESS_LOGIN_HTML = """
         <p>Reindirizzamento alla dashboard...</p>
     </div>
     <script>
-        // Immediate redirect to dashboard (handles browser double-request issue)
-        window.location.href = '/dashboard';
+        // Redirect after short delay to allow user to see success message
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 1500);
     </script>
 </body>
 </html>

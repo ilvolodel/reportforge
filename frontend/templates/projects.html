@@ -149,17 +149,25 @@
         
         .user-details {
             flex: 1;
+            min-width: 0; /* Allow text to shrink below content size */
+            overflow: hidden;
         }
         
         .user-name {
             font-size: 0.9rem;
             font-weight: 600;
             color: #1f2937;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .user-email {
             font-size: 0.75rem;
             color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .logout-btn {
