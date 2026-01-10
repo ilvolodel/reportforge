@@ -13,7 +13,7 @@ import logging
 from typing import Optional
 
 from .config import get_settings
-from .database import SessionLocal
+from .database import SessionLocal, get_db
 from .models.user import UserSession
 
 # Configure logging
