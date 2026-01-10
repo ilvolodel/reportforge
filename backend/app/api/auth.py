@@ -38,14 +38,10 @@ INVALID_LINK_HTML = """
         <h1>❌ Link non valido o scaduto</h1>
         <p>Questo magic link non è valido o è già stato utilizzato.</p>
         <p>I link scadono dopo 15 minuti per sicurezza.</p>
-        <p class="checking">⏳ Verifica accesso in corso...</p>
-        <p><a href="/">← Torna alla pagina di login</a></p>
+        <p style="margin-top: 30px;"><strong>Hai già effettuato l'accesso?</strong></p>
+        <p><a href="/dashboard" style="display: inline-block; padding: 12px 24px; background: #0072CE; color: white; border-radius: 5px; margin: 10px;">Vai alla Dashboard</a></p>
+        <p style="margin-top: 20px;"><a href="/">← Richiedi un nuovo magic link</a></p>
     </div>
-    <script>
-        // Auto-redirect to dashboard immediately (handles double-click/double-request issue)
-        // If user has valid session cookie, dashboard will load, otherwise will redirect to login
-        window.location.href = '/dashboard';
-    </script>
 </body>
 </html>
 """
