@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Members - ReportForge | Tinexta InfoCert</title>
+    <title>Stakeholders - ReportForge | Tinexta InfoCert</title>
     <style>
         :root {
             --infocert-blue: #0072CE;
@@ -399,8 +399,8 @@
                 <li class="nav-item"><a href="/dashboard" class="nav-link">📊 Dashboard</a></li>
                 <li class="nav-item"><a href="/projects" class="nav-link">📁 Projects</a></li>
                 <li class="nav-item"><a href="/clients" class="nav-link">🏢 Clients</a></li>
-                <li class="nav-item"><a href="/team" class="nav-link active">👥 Team Members</a></li>
-                <li class="nav-item"><a href="/stakeholders" class="nav-link">🤝 Stakeholders</a></li>
+                <li class="nav-item"><a href="/team" class="nav-link">👥 Team Members</a></li>
+                <li class="nav-item"><a href="/stakeholders" class="nav-link active">🤝 Stakeholders</a></li>
                 <li class="nav-item"><a href="/subscriptions" class="nav-link">💰 Subscriptions</a></li>
                 <li class="nav-item"><a href="/reports" class="nav-link">📑 Reports</a></li>
             </ul>
@@ -421,12 +421,12 @@
     <!-- Main Content -->
     <main class="main-content">
         <div class="page-header">
-            <h1 class="page-title">Team Members</h1>
-            <button class="btn-primary" onclick="openCreateModal()">+ Nuovo Team Member</button>
+            <h1 class="page-title">Stakeholders</h1>
+            <button class="btn-primary" onclick="openCreateModal()">+ Nuovo Stakeholder</button>
         </div>
         
         <div class="search-bar">
-            <input type="text" class="search-input" placeholder="Cerca team member..." id="searchInput" oninput="filterMembers()">
+            <input type="text" class="search-input" placeholder="Cerca stakeholder..." id="searchInput" oninput="filterStakeholders()">
         </div>
         
         <div id="errorContainer"></div>
@@ -435,13 +435,13 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Nome Completo</th>
-                        <th>Email</th>
-                        <th>Ruolo</th>
+                        <th>Nome</th>
+                        <th>Descrizione</th>
+                        <th>Data Creazione</th>
                         <th>Azioni</th>
                     </tr>
                 </thead>
-                <tbody id="membersTableBody">
+                <tbody id="stakeholdersTableBody">
                     <tr>
                         <td colspan="4" class="loading">Caricamento...</td>
                     </tr>
@@ -451,22 +451,22 @@
     </main>
     
     <!-- Modal Create/Edit -->
-    <div class="modal" id="memberModal">
+    <div class="modal" id="stakeholderModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title" id="modalTitle">Nuovo Client</h2>
                 <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
             
-            <form id="memberForm" onsubmit="saveMember(event)">
+            <form id="stakeholderForm" onsubmit="saveStakeholder(event)">
                 <div class="form-group">
-                    <label class="form-label" for="memberName">Nome Completo *</label>
-                    <input type="text" id="memberName" class="form-input" required>
+                    <label class="form-label" for="stakeholderName">Nome *</label>
+                    <input type="text" id="stakeholderName" class="form-input" required>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" for="memberEmail">Email</label>
-                    <textarea id="memberEmail" class="form-input" type="email"></textarea>
+                    <label class="form-label" for="stakeholderDescription">Descrizione</label>
+                    <textarea id="stakeholderDescription" class="form-textarea"></textarea>
                 </div>
                 
                 <div class="form-actions">
@@ -478,13 +478,13 @@
     </div>
     
     <script>
-        let members = [];
-        let editingMemberId = null;
+        let stakeholders = [];
+        let editingStakeholderId = null;
         
         // Load clients on page load
         document.addEventListener('DOMContentLoaded', () => {
             loadUserInfo();
-            loadMembers();
+            loadStakeholders();
         });
         
         // Load user info
@@ -533,37 +533,37 @@
         }
         
         // Load clients
-        async function loadMembers() {
+        async function loadStakeholders() {
             try {
-                const response = await fetch('/api/team-members');
+                const response = await fetch('/api/stakeholders');
                 if (!response.ok) throw new Error('Failed to load clients');
                 
-                members = await response.json();
-                renderMembers(members);
+                stakeholders = await response.json();
+                renderStakeholders(stakeholders);
             } catch (error) {
                 console.error('Error loading clients:', error);
-                showError('Errore nel caricamento dei team member');
+                showError('Errore nel caricamento degli stakeholder');
             }
         }
         
         // Render clients table
-        function renderMembers(membersToRender) {
-            const tbody = document.getElementById('membersTableBody');
+        function renderStakeholders(stakeholdersToRender) {
+            const tbody = document.getElementById('stakeholdersTableBody');
             
-            if (membersToRender.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Nessun team member trovato</td></tr>';
+            if (stakeholdersToRender.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Nessun stakeholder trovato</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = membersToRender.map(member => `
+            tbody.innerHTML = stakeholdersToRender.map(stakeholder => `
                 <tr>
-                    <td><strong>${escapeHtml(member.full_name)}</strong></td>
-                    <td>${escapeHtml(member.email || '-')}</td>
-                    <td>${formatDate(member.role || '-')}</td>
+                    <td><strong>${escapeHtml(stakeholder.name)}</strong></td>
+                    <td>${escapeHtml(stakeholder.description || '-')}</td>
+                    <td>${formatDate(stakeholder.created_at)}</td>
                     <td>
                         <div class="actions">
-                            <button class="btn-edit" onclick="openEditModal(${member.id})">Modifica</button>
-                            <button class="btn-delete" onclick="deleteMember(${member.id})">Elimina</button>
+                            <button class="btn-edit" onclick="openEditModal(${stakeholder.id})">Modifica</button>
+                            <button class="btn-delete" onclick="deleteStakeholder(${stakeholder.id})">Elimina</button>
                         </div>
                     </td>
                 </tr>
@@ -571,65 +571,64 @@
         }
         
         // Filter clients
-        function filterMembers() {
+        function filterStakeholders() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = members.filter(member => 
-                member.full_name.toLowerCase().includes(searchTerm) ||
-                (member.email && member.email.toLowerCase().includes(searchTerm)) || (member.role && member.role.toLowerCase().includes(searchTerm))
+            const filtered = stakeholders.filter(stakeholder => 
+                stakeholder.name.toLowerCase().includes(searchTerm) ||
+                (stakeholder.description && stakeholder.description.toLowerCase().includes(searchTerm))
             );
-            renderMembers(filtered);
+            renderStakeholders(filtered);
         }
         
         // Open create modal
         function openCreateModal() {
-            editingMemberId = null;
+            editingStakeholderId = null;
             document.getElementById('modalTitle').textContent = 'Nuovo Client';
-            document.getElementById('memberForm').reset();
-            document.getElementById('memberModal').classList.add('active');
+            document.getElementById('stakeholderForm').reset();
+            document.getElementById('stakeholderModal').classList.add('active');
         }
         
         // Open edit modal
-        function openEditModal(memberId) {
-            const member = members.find(m => m.id === memberId);
-            if (!member) return;
+        function openEditModal(stakeholderId) {
+            const stakeholder = stakeholders.find(s => s.id === stakeholderId);
+            if (!stakeholder) return;
             
-            editingMemberId = memberId;
-            document.getElementById('modalTitle').textContent = 'Modifica Team Member';
-            document.getElementById('clientName').value = member.full_name;
-            document.getElementById('clientDescription').value = member.email || '';
-            document.getElementById('memberModal').classList.add('active');
+            editingStakeholderId = stakeholderId;
+            document.getElementById('modalTitle').textContent = 'Modifica Stakeholder';
+            document.getElementById('clientName').value = stakeholder.name;
+            document.getElementById('clientDescription').value = stakeholder.description || '';
+            document.getElementById('stakeholderModal').classList.add('active');
         }
         
         // Close modal
         function closeModal() {
-            document.getElementById('memberModal').classList.remove('active');
-            document.getElementById('memberForm').reset();
-            editingMemberId = null;
+            document.getElementById('stakeholderModal').classList.remove('active');
+            document.getElementById('stakeholderForm').reset();
+            editingStakeholderId = null;
         }
         
         // Save client (create or update)
-        async function saveMember(event) {
+        async function saveStakeholder(event) {
             event.preventDefault();
             
-            const memberData = {
-                full_name: document.getElementById('memberName').value.trim(),
-                email: document.getElementById('memberEmail').value.trim() || null,
-                role: document.getElementById('memberRole').value.trim() || null
+            const stakeholderData = {
+                name: document.getElementById('stakeholderName').value.trim(),
+                description: document.getElementById('stakeholderDescription').value.trim() || null
             };
             
             try {
                 let response;
-                if (editingMemberId) {
-                    response = await fetch(`/api/team-members/${editingMemberId}`, {
+                if (editingStakeholderId) {
+                    response = await fetch(`/api/stakeholders/${editingStakeholderId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(memberData)
+                        body: JSON.stringify(stakeholderData)
                     });
                 } else {
-                    response = await fetch('/api/team-members', {
+                    response = await fetch('/api/stakeholders', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(memberData)
+                        body: JSON.stringify(stakeholderData)
                     });
                 }
                 
@@ -639,7 +638,7 @@
                 }
                 
                 closeModal();
-                loadMembers();
+                loadStakeholders();
             } catch (error) {
                 console.error('Error saving client:', error);
                 showError(error.message);
@@ -647,12 +646,12 @@
         }
         
         // Delete client
-        async function deleteMember(memberId) {
-            const member = members.find(m => m.id === memberId);
-            if (!confirm(`Sei sicuro di voler eliminare "${member.full_name}"?`)) return;
+        async function deleteStakeholder(stakeholderId) {
+            const stakeholder = stakeholders.find(s => s.id === stakeholderId);
+            if (!confirm(`Sei sicuro di voler eliminare "${stakeholder.name}"?`)) return;
             
             try {
-                const response = await fetch(`/api/team-members/${memberId}`, {
+                const response = await fetch(`/api/stakeholders/${stakeholderId}`, {
                     method: 'DELETE'
                 });
                 
@@ -660,7 +659,7 @@
                     throw new Error('Errore nell\'eliminazione');
                 }
                 
-                loadMembers();
+                loadStakeholders();
             } catch (error) {
                 console.error('Error deleting client:', error);
                 showError(error.message);
