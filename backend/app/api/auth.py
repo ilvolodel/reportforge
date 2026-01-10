@@ -214,10 +214,10 @@ async def verify_magic_link(
             logger.warning(f"⚠️ Token not found in database")
             return HTMLResponse(content=INVALID_LINK_HTML, status_code=400)
         
-        # Check if already used recently (within 10 seconds) - allow re-redirect to handle double-clicks
+        # Check if already used recently (within 5 minutes) - allow reuse for testing/development
         if magic_link.is_used and magic_link.used_at:
             time_since_use = (now_utc - magic_link.used_at.replace(tzinfo=timezone.utc)).total_seconds()
-            if time_since_use < 10:
+            if time_since_use < 300:  # 5 minutes for testing
                 logger.info(f"⚡ Token recently used ({time_since_use:.1f}s ago), allowing re-redirect to dashboard")
                 # Find existing session and redirect
                 user_session = db.query(UserSession).filter(
