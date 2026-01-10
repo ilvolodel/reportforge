@@ -106,16 +106,16 @@ async def dashboard(request: Request, session_token: Optional[str] = Cookie(None
 
 
 @app.get("/projects")
-async def projects_page(request: Request, session_token: str = Cookie(None)):
+async def projects_page(request: Request, session_token: Optional[str] = Cookie(None)):
     """Serve the projects management page."""
+    if not templates:
+        return JSONResponse({"error": "Templates not configured"}, status_code=500)
+    
     if not session_token:
         return RedirectResponse(url="/", status_code=303)
     
-    db = get_db()
+    db = SessionLocal()
     try:
-        from .models.auth import UserSession
-        from datetime import datetime, timezone
-        
         now_utc = datetime.now(timezone.utc)
         user_session = db.query(UserSession).filter(
             UserSession.session_token == session_token,
