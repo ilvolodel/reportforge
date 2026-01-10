@@ -815,17 +815,29 @@
         }
 
         async function loadProjects() {
+            console.log('🔍 Loading projects...');
             try {
+                console.log('📡 Fetching /api/projects with credentials');
                 const response = await fetch('/api/projects', {
                     credentials: 'include'
                 });
-                if (!response.ok) throw new Error('Failed to load projects');
+                console.log('📥 Response received:', response.status, response.statusText);
                 
+                if (!response.ok) {
+                    console.error('❌ Response not OK:', response.status);
+                    const text = await response.text();
+                    console.error('Response body:', text);
+                    throw new Error(`Failed to load projects: ${response.status} ${response.statusText}`);
+                }
+
                 projects = await response.json();
+                console.log('✅ Projects loaded:', projects.length);
                 displayProjects();
             } catch (error) {
-                console.error('Error loading projects:', error);
-                showError('Failed to load projects');
+                console.error('💥 Error loading projects:', error);
+                const loading = document.getElementById('loadingState');
+                if (loading) loading.style.display = 'none';
+                showError(`Failed to load projects: ${error.message}`);
             }
         }
 
