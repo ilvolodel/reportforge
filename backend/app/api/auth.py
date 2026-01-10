@@ -347,11 +347,12 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     # Find active session
+    now_utc = datetime.now(timezone.utc)
     user_session = db.query(UserSession).filter(
         and_(
             UserSession.session_token == session_token,
             UserSession.is_active == True,
-            UserSession.expires_at > datetime.utcnow()
+            UserSession.expires_at > now_utc
         )
     ).first()
     
