@@ -1,8 +1,8 @@
 # 📊 ReportForge - Project State Documentation
 
 > **Last Updated:** 2026-01-09  
-> **Version:** 0.5.1 (PDF Generation API Integrated)  
-> **Status:** 🟢 In Development - PDF Generation Working, Frontend CRUD Next
+> **Version:** 0.6.0 (Projects CRUD + Auth UX Polish)  
+> **Status:** 🟢 In Development - Projects Page Working, Continue Frontend CRUD
 
 ---
 
@@ -485,9 +485,9 @@ report_templates (
 26a. ✅ Database Migration - Executed remote migration, dropped old tables, verified 6 new tables
 27. ✅ PDF Template System - WeasyPrint HTML/CSS with 8 modular sections + InfoCert branding
 
-### ✅ Recently Completed (Task 27a)
+### ✅ Recently Completed (Tasks 27a-28)
 
-**PDF Generation API Integration** ✅
+**Task 27a: PDF Generation API Integration** ✅
 - ✅ Created PDFGenerationService (backend/app/services/pdf_service.py)
   - `fetch_report_data()`: Loads all report data from database
   - `generate_pdf()`: Renders HTML with Jinja2 and converts to PDF with WeasyPrint
@@ -500,16 +500,33 @@ report_templates (
 - ✅ Tested in production: Successfully generated 4.1KB PDF + HTML preview (464 lines)
 - ✅ Deployed to production (commit: e3ff90b, docs: 63f51f2)
 
-### ❌ Pending (Tasks 28-34)
+**Task 28: Projects CRUD Frontend** ✅ (2026-01-09)
+- ✅ Created projects.html with full CRUD UI
+  - Projects list with table view
+  - Create/Edit modal forms with validation
+  - Delete confirmation
+  - Loading states and error handling
+- ✅ Fixed Critical: Mixed Content Error (HTTPS behind proxy)
+  - Added `ProxyHeadersMiddleware` to trust `X-Forwarded-Proto` header
+  - Browser now correctly uses HTTPS URLs instead of HTTP
+  - **Resolution:** Middleware reads Nginx proxy headers and sets `request.scope["scheme"] = "https"`
+- ✅ User Info Display & Logout
+  - Auto-loads current user from `/api/auth/me`
+  - Displays full_name or email in sidebar
+  - Logout button with Italian translation
+  - Fixed text overflow in user menu (ellipsis for long emails)
+- ✅ Magic Link UX Improvements
+  - Success page shows for 1.5s before redirect (better UX)
+  - Invalid/expired links auto-redirect to login page (no confusing dashboard button)
+  - Clear error messages
+- ✅ Brand Consistency
+  - Replaced non-brand green with InfoCert blue (#0072CE)
+  - All pages use consistent color palette
+- ✅ Deployed to production (commits: 5719d7e → d2a8a85)
 
-28. **Frontend: Projects CRUD Page** 🔄 NEXT
-    - List view with filters and search
-    - Create/Edit forms with validation
-    - Financial data entry (CAPEX/OPEX)
-    - Team/Stakeholders/Clients assignment
-    - Activities timeline
+### ❌ Pending (Tasks 29-34)
 
-29. **Frontend: Clients, Team, Stakeholders CRUD**
+29. **Frontend: Clients, Team, Stakeholders CRUD** 🔄 NEXT
     - Separate management pages for each entity
     - List views with search
     - Create/Edit modals or forms
@@ -648,15 +665,44 @@ python3 scripts/remote_migrate.py
 
 ## ⚠️ Known Issues & Solutions
 
+### ✅ RESOLVED: Mixed Content Error (HTTPS Proxy)
+
+**Symptom:** Browser trying to load HTTP resources on HTTPS page
+```
+Mixed Content: The page at 'https://...' was loaded over HTTPS, but requested an insecure resource 'http://...'
+```
+
+**Cause:** FastAPI behind Nginx proxy wasn't respecting `X-Forwarded-Proto: https` header. The `request.scope["scheme"]` remained "http" causing browser to interpret relative URLs as HTTP.
+
+**Solution:** Added `ProxyHeadersMiddleware` to `backend/app/main.py`
+```python
+class ProxyHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        forwarded_proto = request.headers.get("x-forwarded-proto")
+        if forwarded_proto:
+            request.scope["scheme"] = forwarded_proto
+        return await call_next(request)
+```
+
+**Status:** ✅ RESOLVED (commit: 5719d7e, 2026-01-09)
+
+---
+
 ### ✅ RESOLVED: Reports API 500 Error
 
 **Was:** Database schema mismatch causing 500 errors
 **Resolution:** Executed remote_migrate.py on 2026-01-09
 **Status:** ✅ All Reports API endpoints working correctly
 
+---
+
 ### Current Issues
 
-**None** - All critical blockers resolved!
+**Minor UI Polish Needed:**
+- Some green colors still present in templates (not critical)
+- Some text styling too bold (cosmetic)
+
+**Status:** 🟡 Low priority - functionality working correctly
 
 ---
 
@@ -691,57 +737,55 @@ ImportError: cannot import name 'ReportProject' from 'app.models.report'
 
 ### Immediate (Current Sprint)
 
-1. **✅ DONE: Fix Database Schema & Test Reports API**
-   - Executed remote_migrate.py successfully
-   - Tested all endpoints working correctly
-   - Templates, Reports, Snapshots all functional
+1. **✅ DONE: Projects CRUD Frontend (Task 28)**
+   - Projects list page working
+   - Create/Edit/Delete functionality
+   - User authentication and display
+   - Mixed Content Error resolved
+   - Magic link UX improved
 
-2. **Design PDF Template Structure** (Task 27 - NEXT PRIORITY)
-   - Review user's PPTX template (available: template.pptx)
-   - Design HTML/CSS layout with InfoCert branding
-   - Make sections modular (show/hide based on template_config)
-   - Use WeasyPrint-compatible CSS
+2. **Build Frontend: Clients, Team, Stakeholders CRUD** (Task 29 - NEXT PRIORITY)
+   - Create clients.html, team.html, stakeholders.html
+   - List views with search and filters
+   - Create/Edit modals (similar pattern to projects.html)
+   - Delete with confirmation
    - ETA: 4-6 hours
 
 ### Short Term (This Week)
 
-4. **Implement PDF Generation**
-   - Install WeasyPrint dependencies
-   - Create Jinja2 templates for report sections
-   - Implement PDF generation endpoint
-   - Test with real data
+3. **Build Frontend: Subscriptions & Revenue CRUD** (Task 30)
+   - Subscriptions list and management
+   - Transaction tracking UI
+   - One-time revenue management
+   - Financial overview widgets
    - ETA: 4-6 hours
-
-5. **Build Frontend: Projects CRUD**
-   - Design UI/UX for projects page
-   - Implement list view with filters
-   - Create/edit forms
-   - Financial data entry (CAPEX/OPEX)
-   - Team assignment
-   - ETA: 6-8 hours
 
 ### Medium Term (Next 2 Weeks)
 
-6. **Build Frontend: Reports Management**
+4. **Build Frontend: Reports Management** (Task 31)
    - Reports list page
    - Create report wizard
    - Report editor with sections
-   - Live PDF preview
+   - PDF generation integration
    - ETA: 8-10 hours
 
-7. **Complete All CRUD Frontends**
-   - Clients, Team Members, Stakeholders
-   - Subscriptions & Revenue
+5. **Report Editor with Live Preview** (Task 32)
+   - Section-by-section editing
+   - Project snapshots inline editing
+   - Executive summary editing
+   - Live HTML preview
    - ETA: 6-8 hours
 
 ### Long Term (Month 1)
 
-8. **Polish & Production Ready**
+6. **End-to-End Testing & Polish** (Task 33-34)
+   - Complete user workflow test
+   - Create projects with full data
+   - Create and edit reports
+   - Generate PDFs and verify quality
    - User feedback integration
    - Bug fixes and refinements
    - Performance optimization
-   - Documentation
-   - Training materials
    - ETA: Ongoing
 
 ---
