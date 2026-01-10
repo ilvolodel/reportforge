@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - ReportForge | Tinexta InfoCert</title>
+    <style>
+        :root {
+            --infocert-blue: #0072CE;
+            --infocert-dark-blue: #005a9e;
+            --infocert-light-blue: #e6f3fb;
+            --infocert-gray: #4a5568;
+            --infocert-light-gray: #f7f9fc;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --error-red: #ef4444;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--infocert-light-gray);
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-main {
+            width: 100%;
+            max-width: 180px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .logo-subtitle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-top: 0.5rem;
+        }
+        
+        .logo-subtitle span {
+            font-size: 0.7rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .logo-tinexta {
+            max-width: 80px;
+            opacity: 0.8;
+        }
+        
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-item {
+            padding: 0 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--infocert-gray);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .nav-link:hover {
+            background: var(--infocert-light-blue);
+            color: var(--infocert-blue);
+        }
+        
+        .nav-link.active {
+            background: var(--infocert-blue);
+            color: white;
+        }
+        
+        .nav-icon {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .nav-section {
+            padding: 1rem 1.5rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1rem;
+        }
+        
+        .user-menu {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--infocert-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-details {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .user-email {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .logout-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        
+        .logout-btn:hover {
+            opacity: 1;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .header h2 {
+            color: #1f2937;
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .header p {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+        
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        
+        .filter-select {
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            cursor: pointer;
+            min-width: 150px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--infocert-blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--infocert-dark-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 114, 206, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--infocert-blue);
+            border: 2px solid var(--infocert-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--infocert-light-blue);
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table thead {
+            background: var(--infocert-light-gray);
+        }
+        
+        .table th {
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--infocert-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table td {
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.95rem;
+        }
+        
+        .table tbody tr:hover {
+            background: var(--infocert-light-gray);
+        }
+        
+        /* Status Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-forecast {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        
+        .badge-proposal {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-sold {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-in-development {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-go-live {
+            background: #fce7f3;
+            color: #9f1239;
+        }
+        
+        .badge-operational {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-completed {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .badge-archived {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        
+        .action-btn:hover {
+            opacity: 1;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--infocert-blue);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: #1f2937;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+        
+        .modal-close:hover {
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+        
+        .form-label.required::after {
+            content: " *";
+            color: var(--error-red);
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--infocert-blue);
+            box-shadow: 0 0 0 3px rgba(0, 114, 206, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .error-message {
+            color: var(--error-red);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="/static/assets/infocert-logo.svg" alt="InfoCert" class="logo-main">
+            <div class="logo-subtitle">
+                <span>powered by</span>
+                <img src="/static/assets/tinexta-logo-official.svg" alt="Tinexta" class="logo-tinexta">
+            </div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="/dashboard" class="nav-link">
+                    <span class="nav-icon">📈</span>
+                    Dashboard
+                </a>
+            </li>
+
+            <div class="nav-section">Data Management</div>
+
+            <li class="nav-item">
+                <a href="/reports" class="nav-link">
+                    <span class="nav-icon">📄</span>
+                    Reports
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/projects" class="nav-link active">
+                    <span class="nav-icon">🚀</span>
+                    Projects
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/clients" class="nav-link">
+                    <span class="nav-icon">👥</span>
+                    Clients
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/revenue" class="nav-link">
+                    <span class="nav-icon">💰</span>
+                    Revenue & Saving
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/team" class="nav-link">
+                    <span class="nav-icon">👨‍💼</span>
+                    Team Members
+                </a>
+            </li>
+
+            <div class="nav-section">Tools</div>
+
+            <li class="nav-item">
+                <a href="/import" class="nav-link">
+                    <span class="nav-icon">📥</span>
+                    Import Data
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/settings" class="nav-link">
+                    <span class="nav-icon">⚙️</span>
+                    Settings
+                </a>
+            </li>
+        </ul>
+
+        <div class="user-menu">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">VD</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-email" id="userEmail">user@infocert.it</div>
+                </div>
+                <button class="logout-btn" onclick="logout()" title="Logout">🚪</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div>
+                    <h2>Projects 🚀</h2>
+                    <p>Manage your projects and track their progress</p>
+                </div>
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    ➕ New Project
+                </button>
+            </div>
+            
+            <!-- Filters -->
+            <div class="filters">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search projects..." onkeyup="filterProjects()">
+                </div>
+                <select class="filter-select" id="statusFilter" onchange="filterProjects()">
+                    <option value="">All Statuses</option>
+                    <option value="FORECAST">Forecast</option>
+                    <option value="PROPOSAL">Proposal</option>
+                    <option value="SOLD">Sold</option>
+                    <option value="IN_DEVELOPMENT">In Development</option>
+                    <option value="GO_LIVE">Go Live</option>
+                    <option value="OPERATIONAL">Operational</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="ARCHIVED">Archived</option>
+                </select>
+                <select class="filter-select" id="typeFilter" onchange="filterProjects()">
+                    <option value="">All Types</option>
+                    <option value="INTERNAL">Internal</option>
+                    <option value="PARTNER">Partner</option>
+                    <option value="CLIENT">Client</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <div id="loadingState" class="loading">
+                <div class="spinner"></div>
+                <p>Loading projects...</p>
+            </div>
+            
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">📦</div>
+                <h3>No projects yet</h3>
+                <p>Get started by creating your first project</p>
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    ➕ Create Project
+                </button>
+            </div>
+            
+            <table class="table" id="projectsTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="projectsTableBody">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">New Project</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="projectForm">
+                    <input type="hidden" id="projectId">
+                    
+                    <div class="form-group">
+                        <label class="form-label required" for="projectName">Project Name</label>
+                        <input type="text" class="form-input" id="projectName" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required" for="projectType">Type</label>
+                            <select class="form-select" id="projectType" required>
+                                <option value="">Select type...</option>
+                                <option value="INTERNAL">Internal</option>
+                                <option value="PARTNER">Partner</option>
+                                <option value="CLIENT">Client</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label required" for="projectStatus">Status</label>
+                            <select class="form-select" id="projectStatus" required>
+                                <option value="FORECAST">Forecast</option>
+                                <option value="PROPOSAL">Proposal</option>
+                                <option value="SOLD">Sold</option>
+                                <option value="IN_DEVELOPMENT">In Development</option>
+                                <option value="GO_LIVE">Go Live</option>
+                                <option value="OPERATIONAL">Operational</option>
+                                <option value="COMPLETED">Completed</option>
+                                <option value="ARCHIVED">Archived</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="projectDescription">Description</label>
+                        <textarea class="form-textarea" id="projectDescription"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="startDate">Start Date</label>
+                            <input type="date" class="form-input" id="startDate">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="endDate">End Date</label>
+                            <input type="date" class="form-input" id="endDate">
+                        </div>
+                    </div>
+                    
+                    <div id="formError" class="error-message" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveProject()">Save Project</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let projects = [];
+        let currentProject = null;
+
+        // Load projects on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserInfo();
+            loadProjects();
+        });
+
+        function loadUserInfo() {
+            fetch('/api/auth/me')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.email) {
+                        document.getElementById('userName').textContent = data.email.split('@')[0];
+                        document.getElementById('userEmail').textContent = data.email;
+                        const initials = data.email.substring(0, 2).toUpperCase();
+                        document.getElementById('userAvatar').textContent = initials;
+                    }
+                })
+                .catch(err => console.error('Error loading user:', err));
+        }
+
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/projects');
+                if (!response.ok) throw new Error('Failed to load projects');
+                
+                projects = await response.json();
+                displayProjects();
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                showError('Failed to load projects');
+            }
+        }
+
+        function displayProjects() {
+            const loading = document.getElementById('loadingState');
+            const empty = document.getElementById('emptyState');
+            const table = document.getElementById('projectsTable');
+            const tbody = document.getElementById('projectsTableBody');
+
+            loading.style.display = 'none';
+
+            if (projects.length === 0) {
+                empty.style.display = 'block';
+                table.style.display = 'none';
+                return;
+            }
+
+            empty.style.display = 'none';
+            table.style.display = 'table';
+
+            tbody.innerHTML = projects.map(project => `
+                <tr>
+                    <td><strong>${escapeHtml(project.name)}</strong></td>
+                    <td>${formatType(project.project_type)}</td>
+                    <td>${getStatusBadge(project.status)}</td>
+                    <td>${formatDate(project.start_date)}</td>
+                    <td>${formatDate(project.end_date)}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="action-btn" onclick="editProject(${project.id})" title="Edit">✏️</button>
+                            <button class="action-btn" onclick="deleteProject(${project.id})" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterProjects() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+
+            const filtered = projects.filter(project => {
+                const matchesSearch = project.name.toLowerCase().includes(searchTerm);
+                const matchesStatus = !statusFilter || project.status === statusFilter;
+                const matchesType = !typeFilter || project.project_type === typeFilter;
+                return matchesSearch && matchesStatus && matchesType;
+            });
+
+            const tbody = document.getElementById('projectsTableBody');
+            tbody.innerHTML = filtered.map(project => `
+                <tr>
+                    <td><strong>${escapeHtml(project.name)}</strong></td>
+                    <td>${formatType(project.project_type)}</td>
+                    <td>${getStatusBadge(project.status)}</td>
+                    <td>${formatDate(project.start_date)}</td>
+                    <td>${formatDate(project.end_date)}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="action-btn" onclick="editProject(${project.id})" title="Edit">✏️</button>
+                            <button class="action-btn" onclick="deleteProject(${project.id})" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openCreateModal() {
+            currentProject = null;
+            document.getElementById('modalTitle').textContent = 'New Project';
+            document.getElementById('projectForm').reset();
+            document.getElementById('projectId').value = '';
+            document.getElementById('formError').style.display = 'none';
+            document.getElementById('projectModal').classList.add('active');
+        }
+
+        function editProject(id) {
+            currentProject = projects.find(p => p.id === id);
+            if (!currentProject) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Project';
+            document.getElementById('projectId').value = currentProject.id;
+            document.getElementById('projectName').value = currentProject.name;
+            document.getElementById('projectType').value = currentProject.project_type;
+            document.getElementById('projectStatus').value = currentProject.status;
+            document.getElementById('projectDescription').value = currentProject.description || '';
+            document.getElementById('startDate').value = currentProject.start_date || '';
+            document.getElementById('endDate').value = currentProject.end_date || '';
+            document.getElementById('formError').style.display = 'none';
+            document.getElementById('projectModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('active');
+            currentProject = null;
+        }
+
+        async function saveProject() {
+            const id = document.getElementById('projectId').value;
+            const data = {
+                name: document.getElementById('projectName').value,
+                project_type: document.getElementById('projectType').value,
+                status: document.getElementById('projectStatus').value,
+                description: document.getElementById('projectDescription').value || null,
+                start_date: document.getElementById('startDate').value || null,
+                end_date: document.getElementById('endDate').value || null
+            };
+
+            if (!data.name || !data.project_type) {
+                showFormError('Please fill in all required fields');
+                return;
+            }
+
+            try {
+                const url = id ? `/api/projects/${id}` : '/api/projects';
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to save project');
+                }
+
+                closeModal();
+                await loadProjects();
+            } catch (error) {
+                console.error('Error saving project:', error);
+                showFormError(error.message);
+            }
+        }
+
+        async function deleteProject(id) {
+            if (!confirm('Are you sure you want to delete this project?')) return;
+
+            try {
+                const response = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Failed to delete project');
+                await loadProjects();
+            } catch (error) {
+                console.error('Error deleting project:', error);
+                showError('Failed to delete project');
+            }
+        }
+
+        function getStatusBadge(status) {
+            const classes = {
+                'FORECAST': 'badge-forecast',
+                'PROPOSAL': 'badge-proposal',
+                'SOLD': 'badge-sold',
+                'IN_DEVELOPMENT': 'badge-in-development',
+                'GO_LIVE': 'badge-go-live',
+                'OPERATIONAL': 'badge-operational',
+                'COMPLETED': 'badge-completed',
+                'ARCHIVED': 'badge-archived'
+            };
+            const labels = {
+                'FORECAST': 'Forecast',
+                'PROPOSAL': 'Proposal',
+                'SOLD': 'Sold',
+                'IN_DEVELOPMENT': 'In Dev',
+                'GO_LIVE': 'Go Live',
+                'OPERATIONAL': 'Active',
+                'COMPLETED': 'Done',
+                'ARCHIVED': 'Archived'
+            };
+            return `<span class="badge ${classes[status]}">${labels[status]}</span>`;
+        }
+
+        function formatType(type) {
+            const types = {
+                'INTERNAL': 'Internal',
+                'PARTNER': 'Partner',
+                'CLIENT': 'Client'
+            };
+            return types[type] || type;
+        }
+
+        function formatDate(date) {
+            if (!date) return '-';
+            return new Date(date).toLocaleDateString('en-GB');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showFormError(message) {
+            const errorEl = document.getElementById('formError');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function showError(message) {
+            alert(message); // Simple alert for now, could be improved with toast notifications
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                fetch('/api/auth/logout', { method: 'POST' })
+                    .then(() => window.location.href = '/login')
+                    .catch(err => console.error('Logout error:', err));
+            }
+        }
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Close modal on background click
+        document.getElementById('projectModal').addEventListener('click', (e) => {
+            if (e.target.id === 'projectModal') closeModal();
+        });
+    </script>
+</body>
+</html>

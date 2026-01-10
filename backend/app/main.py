@@ -105,6 +105,31 @@ async def dashboard(request: Request, session_token: Optional[str] = Cookie(None
         db.close()
 
 
+@app.get("/projects")
+async def projects_page(request: Request, session_token: str = Cookie(None)):
+    """Serve the projects management page."""
+    if not session_token:
+        return RedirectResponse(url="/", status_code=303)
+    
+    db = get_db()
+    try:
+        from .models.auth import UserSession
+        from datetime import datetime, timezone
+        
+        now_utc = datetime.now(timezone.utc)
+        user_session = db.query(UserSession).filter(
+            UserSession.session_token == session_token,
+            UserSession.expires_at > now_utc
+        ).first()
+        
+        if not user_session:
+            return RedirectResponse(url="/", status_code=303)
+        
+        return templates.TemplateResponse("projects.html", {"request": request})
+    finally:
+        db.close()
+
+
 # Import and include API routers
 from .api import auth, projects, clients, team, subscriptions, reports
 
