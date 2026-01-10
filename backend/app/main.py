@@ -143,6 +143,72 @@ async def projects_page(request: Request, session_token: Optional[str] = Cookie(
         db.close()
 
 
+@app.get("/clients")
+async def clients_page(request: Request, session_token: str = Cookie(None)):
+    """Clients management page."""
+    if not session_token:
+        return RedirectResponse(url="/", status_code=303)
+    
+    db = next(get_db())
+    try:
+        now_utc = datetime.now(timezone.utc)
+        user_session = db.query(UserSession).filter(
+            UserSession.session_token == session_token,
+            UserSession.expires_at > now_utc
+        ).first()
+        
+        if not user_session:
+            return RedirectResponse(url="/", status_code=303)
+        
+        return templates.TemplateResponse("clients.html", {"request": request})
+    finally:
+        db.close()
+
+
+@app.get("/team")
+async def team_page(request: Request, session_token: str = Cookie(None)):
+    """Team members management page."""
+    if not session_token:
+        return RedirectResponse(url="/", status_code=303)
+    
+    db = next(get_db())
+    try:
+        now_utc = datetime.now(timezone.utc)
+        user_session = db.query(UserSession).filter(
+            UserSession.session_token == session_token,
+            UserSession.expires_at > now_utc
+        ).first()
+        
+        if not user_session:
+            return RedirectResponse(url="/", status_code=303)
+        
+        return templates.TemplateResponse("team.html", {"request": request})
+    finally:
+        db.close()
+
+
+@app.get("/stakeholders")
+async def stakeholders_page(request: Request, session_token: str = Cookie(None)):
+    """Stakeholders management page."""
+    if not session_token:
+        return RedirectResponse(url="/", status_code=303)
+    
+    db = next(get_db())
+    try:
+        now_utc = datetime.now(timezone.utc)
+        user_session = db.query(UserSession).filter(
+            UserSession.session_token == session_token,
+            UserSession.expires_at > now_utc
+        ).first()
+        
+        if not user_session:
+            return RedirectResponse(url="/", status_code=303)
+        
+        return templates.TemplateResponse("stakeholders.html", {"request": request})
+    finally:
+        db.close()
+
+
 # Import and include API routers
 from .api import auth, projects, clients, team, subscriptions, reports
 

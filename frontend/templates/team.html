@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Members - ReportForge | Tinexta InfoCert</title>
+    <link rel="stylesheet" href="/static/css/common.css">
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/sidebar.js"></script>
+</head>
+<body>
+    <div id="sidebar"></div>
+    
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Team Members</h1>
+            <button class="btn-primary" onclick="openCreateModal()">+ Nuovo Team Member</button>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Cerca team member..." id="searchInput" oninput="filterMembers()">
+        </div>
+        
+        <div id="errorContainer"></div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Ruolo</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="membersTableBody">
+                    <tr>
+                        <td colspan="4" class="loading">Caricamento...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    
+    <!-- Modal -->
+    <div class="modal" id="memberModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Nuovo Team Member</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <form id="memberForm" onsubmit="saveMember(event)">
+                <div class="form-group">
+                    <label class="form-label" for="memberName">Nome Completo *</label>
+                    <input type="text" id="memberName" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="memberEmail">Email</label>
+                    <input type="email" id="memberEmail" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="memberRole">Ruolo</label>
+                    <input type="text" id="memberRole" class="form-input" placeholder="es. PM, Developer, Architect">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Annulla</button>
+                    <button type="submit" class="btn-primary">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let members = [];
+        let editingMemberId = null;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initSidebar('team');
+            loadMembers();
+        });
+        
+        async function loadMembers() {
+            try {
+                const response = await fetch('/api/team-members');
+                if (!response.ok) throw new Error('Failed to load team members');
+                
+                members = await response.json();
+                renderMembers(members);
+            } catch (error) {
+                console.error('Error loading team members:', error);
+                showError('Errore nel caricamento dei team member');
+            }
+        }
+        
+        function renderMembers(membersToRender) {
+            const tbody = document.getElementById('membersTableBody');
+            
+            if (membersToRender.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Nessun team member trovato</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = membersToRender.map(member => `
+                <tr>
+                    <td><strong>${escapeHtml(member.full_name)}</strong></td>
+                    <td>${escapeHtml(member.email || '-')}</td>
+                    <td>${escapeHtml(member.role || '-')}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn-edit" onclick="openEditModal(${member.id})">Modifica</button>
+                            <button class="btn-delete" onclick="deleteMember(${member.id})">Elimina</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function filterMembers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = members.filter(member => 
+                member.full_name.toLowerCase().includes(searchTerm) ||
+                (member.email && member.email.toLowerCase().includes(searchTerm)) ||
+                (member.role && member.role.toLowerCase().includes(searchTerm))
+            );
+            renderMembers(filtered);
+        }
+        
+        function openCreateModal() {
+            editingMemberId = null;
+            document.getElementById('modalTitle').textContent = 'Nuovo Team Member';
+            document.getElementById('memberForm').reset();
+            document.getElementById('memberModal').classList.add('active');
+        }
+        
+        function openEditModal(memberId) {
+            const member = members.find(m => m.id === memberId);
+            if (!member) return;
+            
+            editingMemberId = memberId;
+            document.getElementById('modalTitle').textContent = 'Modifica Team Member';
+            document.getElementById('memberName').value = member.full_name;
+            document.getElementById('memberEmail').value = member.email || '';
+            document.getElementById('memberRole').value = member.role || '';
+            document.getElementById('memberModal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('memberModal').classList.remove('active');
+            document.getElementById('memberForm').reset();
+            editingMemberId = null;
+        }
+        
+        async function saveMember(event) {
+            event.preventDefault();
+            
+            const memberData = {
+                full_name: document.getElementById('memberName').value.trim(),
+                email: document.getElementById('memberEmail').value.trim() || null,
+                role: document.getElementById('memberRole').value.trim() || null
+            };
+            
+            try {
+                let response;
+                if (editingMemberId) {
+                    response = await fetch(`/api/team-members/${editingMemberId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(memberData)
+                    });
+                } else {
+                    response = await fetch('/api/team-members', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(memberData)
+                    });
+                }
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Errore nel salvataggio');
+                }
+                
+                closeModal();
+                loadMembers();
+            } catch (error) {
+                console.error('Error saving team member:', error);
+                showError(error.message);
+            }
+        }
+        
+        async function deleteMember(memberId) {
+            const member = members.find(m => m.id === memberId);
+            if (!confirm(`Sei sicuro di voler eliminare "${member.full_name}"?`)) return;
+            
+            try {
+                const response = await fetch(`/api/team-members/${memberId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Errore nell\'eliminazione');
+                }
+                
+                loadMembers();
+            } catch (error) {
+                console.error('Error deleting team member:', error);
+                showError(error.message);
+            }
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showError(message) {
+            const container = document.getElementById('errorContainer');
+            container.innerHTML = `<div class="error-message">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

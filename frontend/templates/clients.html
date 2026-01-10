@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clients - ReportForge | Tinexta InfoCert</title>
+    <style>
+        :root {
+            --infocert-blue: #0072CE;
+            --infocert-dark-blue: #005a9e;
+            --infocert-light-blue: #e6f3fb;
+            --infocert-gray: #4a5568;
+            --infocert-light-gray: #f7f9fc;
+            --error-red: #ef4444;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--infocert-light-gray);
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-main {
+            width: 100%;
+            max-width: 180px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .logo-subtitle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-top: 0.5rem;
+        }
+        
+        .logo-subtitle span {
+            font-size: 0.7rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .logo-tinexta {
+            max-width: 80px;
+            opacity: 0.8;
+        }
+        
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-link {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--infocert-gray);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background: var(--infocert-light-blue);
+            color: var(--infocert-blue);
+        }
+        
+        .nav-link.active {
+            background: var(--infocert-light-blue);
+            color: var(--infocert-blue);
+            border-left: 3px solid var(--infocert-blue);
+        }
+        
+        .user-section {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--infocert-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .user-details {
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        
+        .user-email {
+            font-size: 0.75rem;
+            color: #666;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: var(--error-red);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: opacity 0.2s;
+        }
+        
+        .logout-btn:hover {
+            opacity: 0.9;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            color: var(--infocert-gray);
+        }
+        
+        .btn-primary {
+            padding: 0.75rem 1.5rem;
+            background: var(--infocert-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: var(--infocert-dark-blue);
+        }
+        
+        /* Search Bar */
+        .search-bar {
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: var(--infocert-light-blue);
+        }
+        
+        th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--infocert-dark-blue);
+        }
+        
+        td {
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        tbody tr:hover {
+            background: var(--infocert-light-gray);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-edit, .btn-delete {
+            padding: 0.375rem 0.75rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: opacity 0.2s;
+        }
+        
+        .btn-edit {
+            background: var(--infocert-blue);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: var(--error-red);
+            color: white;
+        }
+        
+        .btn-edit:hover, .btn-delete:hover {
+            opacity: 0.85;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--infocert-gray);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--infocert-gray);
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            background: #e5e7eb;
+            color: var(--infocert-gray);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: var(--error-red);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="/static/img/infocert-logo.svg" alt="InfoCert" class="logo-main" onerror="this.style.display='none'">
+            <div class="logo-subtitle">
+                <span>Powered by</span>
+                <img src="/static/img/tinexta-logo.svg" alt="Tinexta" class="logo-tinexta" onerror="this.style.display='none'">
+            </div>
+        </div>
+        
+        <nav>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/dashboard" class="nav-link">📊 Dashboard</a></li>
+                <li class="nav-item"><a href="/projects" class="nav-link">📁 Projects</a></li>
+                <li class="nav-item"><a href="/clients" class="nav-link active">🏢 Clients</a></li>
+                <li class="nav-item"><a href="/team" class="nav-link">👥 Team Members</a></li>
+                <li class="nav-item"><a href="/stakeholders" class="nav-link">🤝 Stakeholders</a></li>
+                <li class="nav-item"><a href="/subscriptions" class="nav-link">💰 Subscriptions</a></li>
+                <li class="nav-item"><a href="/reports" class="nav-link">📑 Reports</a></li>
+            </ul>
+        </nav>
+        
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">?</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">Esci</button>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Clients</h1>
+            <button class="btn-primary" onclick="openCreateModal()">+ Nuovo Client</button>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Cerca client..." id="searchInput" oninput="filterClients()">
+        </div>
+        
+        <div id="errorContainer"></div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrizione</th>
+                        <th>Data Creazione</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="clientsTableBody">
+                    <tr>
+                        <td colspan="4" class="loading">Caricamento...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    
+    <!-- Modal Create/Edit -->
+    <div class="modal" id="clientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Nuovo Client</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <form id="clientForm" onsubmit="saveClient(event)">
+                <div class="form-group">
+                    <label class="form-label" for="clientName">Nome *</label>
+                    <input type="text" id="clientName" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="clientDescription">Descrizione</label>
+                    <textarea id="clientDescription" class="form-textarea"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Annulla</button>
+                    <button type="submit" class="btn-primary">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let clients = [];
+        let editingClientId = null;
+        
+        // Load clients on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserInfo();
+            loadClients();
+        });
+        
+        // Load user info
+        async function loadUserInfo() {
+            console.log('👤 Loading user info...');
+            try {
+                const response = await fetch('/api/auth/me');
+                console.log('📥 User info response:', response.status);
+                
+                if (!response.ok) {
+                    console.error('❌ Failed to load user info');
+                    window.location.href = '/';
+                    return;
+                }
+                
+                const user = await response.json();
+                console.log('✅ User data:', user);
+                
+                const userName = user.full_name || user.email.split('@')[0];
+                const initials = user.full_name 
+                    ? user.full_name.split(' ').map(n => n[0]).join('').toUpperCase()
+                    : user.email[0].toUpperCase();
+                
+                document.getElementById('userName').textContent = userName;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userAvatar').textContent = initials;
+            } catch (error) {
+                console.error('❌ Error loading user info:', error);
+                window.location.href = '/';
+            }
+        }
+        
+        // Logout
+        async function logout() {
+            if (!confirm('Sei sicuro di voler uscire?')) return;
+            
+            console.log('🚪 Logging out...');
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                console.log('✅ Logout successful');
+            } catch (error) {
+                console.error('❌ Logout error:', error);
+            } finally {
+                window.location.href = '/';
+            }
+        }
+        
+        // Load clients
+        async function loadClients() {
+            try {
+                const response = await fetch('/api/clients');
+                if (!response.ok) throw new Error('Failed to load clients');
+                
+                clients = await response.json();
+                renderClients(clients);
+            } catch (error) {
+                console.error('Error loading clients:', error);
+                showError('Errore nel caricamento dei client');
+            }
+        }
+        
+        // Render clients table
+        function renderClients(clientsToRender) {
+            const tbody = document.getElementById('clientsTableBody');
+            
+            if (clientsToRender.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Nessun client trovato</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = clientsToRender.map(client => `
+                <tr>
+                    <td><strong>${escapeHtml(client.name)}</strong></td>
+                    <td>${escapeHtml(client.description || '-')}</td>
+                    <td>${formatDate(client.created_at)}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn-edit" onclick="openEditModal(${client.id})">Modifica</button>
+                            <button class="btn-delete" onclick="deleteClient(${client.id})">Elimina</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Filter clients
+        function filterClients() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = clients.filter(client => 
+                client.name.toLowerCase().includes(searchTerm) ||
+                (client.description && client.description.toLowerCase().includes(searchTerm))
+            );
+            renderClients(filtered);
+        }
+        
+        // Open create modal
+        function openCreateModal() {
+            editingClientId = null;
+            document.getElementById('modalTitle').textContent = 'Nuovo Client';
+            document.getElementById('clientForm').reset();
+            document.getElementById('clientModal').classList.add('active');
+        }
+        
+        // Open edit modal
+        function openEditModal(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+            
+            editingClientId = clientId;
+            document.getElementById('modalTitle').textContent = 'Modifica Client';
+            document.getElementById('clientName').value = client.name;
+            document.getElementById('clientDescription').value = client.description || '';
+            document.getElementById('clientModal').classList.add('active');
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('clientModal').classList.remove('active');
+            document.getElementById('clientForm').reset();
+            editingClientId = null;
+        }
+        
+        // Save client (create or update)
+        async function saveClient(event) {
+            event.preventDefault();
+            
+            const clientData = {
+                name: document.getElementById('clientName').value.trim(),
+                description: document.getElementById('clientDescription').value.trim() || null
+            };
+            
+            try {
+                let response;
+                if (editingClientId) {
+                    response = await fetch(`/api/clients/${editingClientId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(clientData)
+                    });
+                } else {
+                    response = await fetch('/api/clients', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(clientData)
+                    });
+                }
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Errore nel salvataggio');
+                }
+                
+                closeModal();
+                loadClients();
+            } catch (error) {
+                console.error('Error saving client:', error);
+                showError(error.message);
+            }
+        }
+        
+        // Delete client
+        async function deleteClient(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (!confirm(`Sei sicuro di voler eliminare "${client.name}"?`)) return;
+            
+            try {
+                const response = await fetch(`/api/clients/${clientId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Errore nell\'eliminazione');
+                }
+                
+                loadClients();
+            } catch (error) {
+                console.error('Error deleting client:', error);
+                showError(error.message);
+            }
+        }
+        
+        // Utility functions
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('it-IT');
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showError(message) {
+            const container = document.getElementById('errorContainer');
+            container.innerHTML = `<div class="error-message">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
