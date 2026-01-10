@@ -62,7 +62,7 @@ SUCCESS_LOGIN_HTML = """
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #0072CE 0%, #005a9e 100%); color: white; }
         .container { background: white; color: #333; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { color: #28a745; }
+        h1 { color: #0072CE; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #0072CE; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
